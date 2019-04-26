@@ -30,18 +30,37 @@ export default function (state: State): TileType[][] {
     result[size - 1 - w.y][w.x] = TileType.Wall
   })
 
-  items.forEach(i => {
+  itemCoordinates(state).forEach(i => {
+    result[size - 1 - i.y][i.x] = TileType.Item
+  })
+
+  playerItemCoordinates(state).forEach(i => {
+    result[size - 1 - i.y][i.x] = TileType.PlayerItem
+  })
+  result[size - 1 - player.y][player.x] = TileType.Player
+
+  return result
+}
+
+export function itemCoordinates(state: State): Position[] {
+  let result: Position[] = []
+  state.items.forEach(i => {
     i.coordinates.forEach(c => {
-      result[size - 1 - (i.y + c.y)][i.x + c.x] = TileType.Item
+      result.push({ y: i.y + c.y, x: i.x + c.x })
     })
   })
 
-  player.items.forEach(i => {
+  return result
+}
+
+export function playerItemCoordinates(state: State): Position[] {
+  let result: Position[] = []
+
+  state.player.items.forEach(i => {
     i.coordinates.forEach(c => {
-      result[size - 1 - (player.y + i.y + c.y)][player.x + i.x + c.x] = TileType.PlayerItem
+      result.push({ y: state.player.y + i.y + c.y, x: state.player.x + i.x + c.x })
     })
   })
-  result[size - 1 - player.y][player.x] = TileType.Player
 
   return result
 }
