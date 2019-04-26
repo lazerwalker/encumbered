@@ -61,6 +61,14 @@ export function pickUpItem(player: Player, item: Item): Item {
   }
 }
 
+export function dropItem(player: Player, item: Item): Item {
+  return {
+    ...item,
+    x: item.x + player.x,
+    y: item.y + player.y
+  }
+}
+
 export function itemCoordinates(state: State): GamePosition[] {
   return _.flatten(state.items.map(coordinatesForItem))
 }

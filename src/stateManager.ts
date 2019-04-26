@@ -1,5 +1,5 @@
 import { State } from "./App";
-import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem } from "./GridCalculator";
+import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem } from "./GridCalculator";
 import _ from "lodash";
 import { stat } from "fs";
 import { Item } from "./Player";
@@ -30,7 +30,24 @@ export function moveDown(state: State): State {
 }
 
 export function release(state: State): State {
-  return state
+  let newItems: Item[] = [...state.items]
+  let playerItems = state.player.items
+
+  state.player.items.forEach(i => {
+    let newItem = dropItem(state.player, i)
+    newItems.push(newItem)
+    playerItems = _.without(playerItems, i)
+  })
+
+  if (newItems.length > 0) {
+    return {
+      ...state,
+      player: { ...state.player, items: playerItems },
+      items: newItems
+    }
+  } else {
+    return state
+  }
 }
 
 function stateIsValid(state: State): boolean {
