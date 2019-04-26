@@ -1,5 +1,5 @@
 import { State } from "./App";
-import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem } from "./GridCalculator";
+import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates } from "./GridCalculator";
 import _ from "lodash";
 import { stat } from "fs";
 import { Item } from "./Player";
@@ -59,12 +59,8 @@ function stateIsValid(state: State): boolean {
   }
 
   // If any player bit is over an edge, collide
-  if (_.find(playerCoordinates, c => {
-    return c.x < 0 ||
-      c.x >= state.size ||
-      c.y < 0 ||
-      c.y >= state.size
-  })) {
+  let edgeTiles = boundsCoordinates(state)
+  if (_.intersectionWith(playerCoordinates, edgeTiles, _.isEqual).length > 0) {
     return false
   }
 

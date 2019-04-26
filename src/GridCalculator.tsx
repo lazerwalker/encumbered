@@ -109,3 +109,17 @@ export function playerItemCoordinates(state: State): GamePosition[] {
 
   return result
 }
+
+// Coords of all room wall tiles, without the corridors
+export function boundsCoordinates(state: State): GamePosition[] {
+  let result: GamePosition[] = []
+
+  for (let i = -1; i <= state.size; i++) {
+    result.push({ x: -1, y: i })
+    result.push({ x: state.size, y: i })
+    result.push({ x: i, y: -1 })
+    result.push({ x: i, y: state.size })
+  }
+
+  return _.differenceWith(result, state.exits, _.isEqual)
+}
