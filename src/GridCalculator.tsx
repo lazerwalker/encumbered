@@ -9,7 +9,7 @@ export enum TileType {
   Item = "!"
 }
 
-interface Position {
+export interface GamePosition {
   x: number, y: number
 }
 
@@ -42,8 +42,8 @@ export default function (state: State): TileType[][] {
   return result
 }
 
-export function itemCoordinates(state: State): Position[] {
-  let result: Position[] = []
+export function itemCoordinates(state: State): GamePosition[] {
+  let result: GamePosition[] = []
   state.items.forEach(i => {
     i.coordinates.forEach(c => {
       result.push({ y: i.y + c.y, x: i.x + c.x })
@@ -53,8 +53,8 @@ export function itemCoordinates(state: State): Position[] {
   return result
 }
 
-export function playerItemCoordinates(state: State): Position[] {
-  let result: Position[] = []
+export function playerItemCoordinates(state: State): GamePosition[] {
+  let result: GamePosition[] = []
 
   state.player.items.forEach(i => {
     i.coordinates.forEach(c => {

@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import GridCalculator, { TileType } from './GridCalculator';
 import { Player, Item } from './Player';
+import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
 
 function print(tiles: TileType[][]): string {
   return tiles
@@ -35,12 +35,11 @@ class App extends React.Component<{}, State> {
             { x: 1, y: -1 }
           ]
         }
-
         ]
       },
       walls: [
-        { x: 1, y: 1 },
-        { x: 2, y: 1 }
+        { x: 0, y: 0 },
+        { x: 1, y: 0 }
       ],
       items: [{
         x: 4,
@@ -54,6 +53,14 @@ class App extends React.Component<{}, State> {
     }
   }
 
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleKeyDown)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeyDown)
+  }
+
   render() {
     let grid = GridCalculator(this.state)
     print(grid)
@@ -65,6 +72,23 @@ class App extends React.Component<{}, State> {
         </pre>
       </div>
     );
+  }
+
+  handleKeyDown = (e: KeyboardEvent) => {
+    let keyMap: { [keyCode: string]: GameReducer } = {
+      "ArrowUp": moveUp,
+      "ArrowDown": moveDown,
+      "ArrowLeft": moveLeft,
+      "ArrowRight": moveRight,
+      "Space": release
+    }
+    const result = keyMap[e.code];
+    if (!result) {
+      console.log("COULD NOT FIND HANDLER", e)
+      return
+    }
+
+    this.setState(result(this.state))
   }
 }
 
