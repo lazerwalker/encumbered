@@ -17,50 +17,55 @@ export interface State {
   size: number
 }
 
-const App: React.FC = () => {
-  let initialState: State = {
-    size: 8,
-    player: {
-      x: 2,
-      y: 2,
+class App extends React.Component<{}, State> {
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      size: 8,
+      player: {
+        x: 2,
+        y: 2,
+        items: [{
+          x: 1,
+          y: 0,
+          coordinates: [
+            { x: 0, y: 0 },
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 1, y: -1 }
+          ]
+        }
+
+        ]
+      },
+      walls: [
+        { x: 1, y: 1 },
+        { x: 2, y: 1 }
+      ],
       items: [{
-        x: 1,
-        y: 0,
+        x: 4,
+        y: 4,
         coordinates: [
           { x: 0, y: 0 },
-          { x: 0, y: -1 },
           { x: 1, y: 0 },
-          { x: 1, y: -1 }
+          { x: 1, y: 1 }
         ]
-      }
-
-      ]
-    },
-    walls: [
-      { x: 1, y: 1 },
-      { x: 2, y: 1 }
-    ],
-    items: [{
-      x: 4,
-      y: 4,
-      coordinates: [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 },
-        { x: 1, y: 1 }
-      ]
-    }]
+      }]
+    }
   }
 
-  let grid = GridCalculator(initialState)
-  print(grid)
+  render() {
+    let grid = GridCalculator(this.state)
+    print(grid)
 
-  return (
-    <div className="App">
-      <pre>
-        {print(grid)}
-      </pre>
-    </div>
-  );
+    return (
+      <div className="App">
+        <pre>
+          {print(grid)}
+        </pre>
+      </div>
+    );
+  }
 }
 
 export default App;
