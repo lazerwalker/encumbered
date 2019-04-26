@@ -61,7 +61,8 @@ class App extends React.Component<{}, State> {
     window.addEventListener('keydown', this.handleKeyDown)
     var manager = nipplejs.create({
       color: "#000",
-      fadeTime: 0
+      dataOnly: true,
+      fadeTime: 0,
     });
 
     manager.on('added', (evt: any, nipple: any) => {
@@ -83,6 +84,7 @@ class App extends React.Component<{}, State> {
         <pre>
           {print(grid)}
         </pre>
+        <button id='drop' onTouchStart={this.didTapDrop}>Drop</button>
       </div>
     );
   }
@@ -136,6 +138,10 @@ class App extends React.Component<{}, State> {
     }
 
     this.setState(result(this.state))
+  }
+
+  didTapDrop = () => {
+    this.setState(release(this.state))
   }
 }
 

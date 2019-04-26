@@ -4,6 +4,28 @@ body {
   position: fixed;
 }
 
+pre {
+  background-color: #444;
+  border: 1px solid black;
+  color: #eee;
+  font-size: 60px;
+  line-height: 60px;
+  letter-spacing: 10px;
+  margin: auto;
+  margin-top: 30px;
+  padding-bottom: 5px;
+  width: 380px;
+}
+
+#drop {
+  bottom: 10px;
+  height: 60px;
+  margin: auto;
+  margin-top: 20px;
+  width: 90%;
+  text-align: center;
+}
+
 .App {
   text-align: center;
 }
