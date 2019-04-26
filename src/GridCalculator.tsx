@@ -1,5 +1,6 @@
 import { Player, Item } from "./Player";
 import { State } from "./App";
+import _ from "lodash";
 
 export enum TileType {
   Floor = " ",
@@ -42,15 +43,26 @@ export default function (state: State): TileType[][] {
   return result
 }
 
-export function itemCoordinates(state: State): GamePosition[] {
+export function coordinatesForItem(item: Item): GamePosition[] {
   let result: GamePosition[] = []
-  state.items.forEach(i => {
-    i.coordinates.forEach(c => {
-      result.push({ y: i.y + c.y, x: i.x + c.x })
-    })
+
+  item.coordinates.forEach(c => {
+    result.push({ y: item.y + c.y, x: item.x + c.x })
   })
 
   return result
+}
+
+export function pickUpItem(player: Player, item: Item): Item {
+  return {
+    ...item,
+    x: item.x - player.x,
+    y: item.y - player.y
+  }
+}
+
+export function itemCoordinates(state: State): GamePosition[] {
+  return _.flatten(state.items.map(coordinatesForItem))
 }
 
 export function playerItemCoordinates(state: State): GamePosition[] {
