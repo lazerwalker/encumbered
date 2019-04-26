@@ -4,6 +4,8 @@ import GridCalculator, { TileType } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
 
+const nipplejs = require('nipplejs')
+
 function print(tiles: TileType[][]): string {
   return tiles
     .map(t => t.join(""))
@@ -18,6 +20,8 @@ export interface State {
 }
 
 class App extends React.Component<{}, State> {
+  joystickTimerId: NodeJS.Timeout | undefined
+
   constructor(props: any) {
     super(props)
     this.state = {
@@ -55,6 +59,14 @@ class App extends React.Component<{}, State> {
 
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown)
+    var manager = nipplejs.create({
+      color: "#000"
+    });
+
+    manager.on('added', (evt: any, nipple: any) => {
+      nipple.on('dir', this.handleJoystickMove)
+      nipple.on('end', this.handleJoystickEnd)
+    })
   }
 
   componentWillUnmount() {
@@ -72,6 +84,40 @@ class App extends React.Component<{}, State> {
         </pre>
       </div>
     );
+  }
+
+  handleJoystickMove = (e: any) => {
+    if (this.joystickTimerId) {
+      clearTimeout(this.joystickTimerId)
+    }
+
+    console.log(e.target.direction.angle)
+    let keyMap: { [dir: string]: GameReducer } = {
+      "up": moveUp,
+      "down": moveDown,
+      "left": moveLeft,
+      "right": moveRight,
+    }
+    const result = keyMap[e.target.direction.angle];
+    if (!result) {
+      console.log("COULD NOT FIND HANDLER", e)
+      return
+    }
+
+    const repeat = () => {
+      this.setState(result(this.state))
+      this.joystickTimerId = setTimeout(repeat, 150)
+    }
+
+    this.joystickTimerId = setTimeout(repeat, 300)
+
+    this.setState(result(this.state))
+  }
+
+  handleJoystickEnd = (e: any) => {
+    if (this.joystickTimerId) {
+      clearTimeout(this.joystickTimerId)
+    }
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
