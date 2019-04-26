@@ -60,7 +60,8 @@ class App extends React.Component<{}, State> {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown)
     var manager = nipplejs.create({
-      color: "#000"
+      color: "#000",
+      fadeTime: 0
     });
 
     manager.on('added', (evt: any, nipple: any) => {
