@@ -18,6 +18,7 @@ export interface State {
   items: Item[]
   size: number
   walls: GamePosition[]
+  exited: boolean
 }
 
 class App extends React.Component<{}, State> {
@@ -27,6 +28,7 @@ class App extends React.Component<{}, State> {
     super(props)
     this.state = {
       size: 8,
+      exited: false,
       player: {
         x: 2,
         y: 2,

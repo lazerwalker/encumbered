@@ -1,5 +1,5 @@
 import { State } from "./App";
-import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates } from "./GridCalculator";
+import GridCalculator, { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates, TileType } from "./GridCalculator";
 import _ from "lodash";
 import { stat } from "fs";
 import { Item, Player } from "./Player";
@@ -46,9 +46,19 @@ export function release(state: State): State {
   }
 }
 
-function processPlayerChange(player: Player, state: State): State {
-  const newState = tryToPickUpItems({ ...state, player }, state)
-  return stateIsValid(newState) ? newState : state
+function processPlayerChange(player: Player, oldState: State): State {
+  const state = tryToPickUpItems({ ...oldState, player }, oldState)
+
+  if (!stateIsValid(state)) {
+    return oldState
+  }
+
+  if (hasExitedRoom(state)) {
+    state.exited = true
+    return state
+  }
+
+  return state
 }
 
 function stateIsValid(state: State): boolean {
@@ -94,5 +104,9 @@ function tryToPickUpItems(state: State, oldState: State): State {
   } else {
     return state
   }
+}
 
+function hasExitedRoom(state: State): boolean {
+  const result = _.flatten(GridCalculator(state))
+  return !_.find(result, t => t === TileType.Player || t === TileType.PlayerItem)
 }
