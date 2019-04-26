@@ -25,6 +25,7 @@ export interface State {
 
 class App extends React.Component<{}, State> {
   joystickTimerId: NodeJS.Timeout | undefined
+  maybeTouch: boolean = false
 
   constructor(props: any) {
     super(props)
@@ -72,6 +73,11 @@ class App extends React.Component<{}, State> {
 
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown)
+
+    window.addEventListener('touchstart', this.handleTouchStart)
+    window.addEventListener('touchmove', this.handleTouchMove)
+    window.addEventListener('touchend', this.handleTouchEnd)
+
     var manager = nipplejs.create({
       color: "#000",
       dataOnly: true,
@@ -98,7 +104,7 @@ class App extends React.Component<{}, State> {
         <pre>
           {print(grid)}
         </pre>
-        <button id='drop' onTouchStart={this.didTapDrop}>Drop</button>
+        <button id='drop'>Drop</button>
       </div>
     );
   }
@@ -156,6 +162,21 @@ class App extends React.Component<{}, State> {
 
   didTapDrop = () => {
     this.setState(release(this.state))
+  }
+
+  handleTouchStart = (e: any) => {
+    this.maybeTouch = true
+  }
+
+  handleTouchMove = (e: any) => {
+    this.maybeTouch = false
+  }
+
+  handleTouchEnd = (e: any) => {
+    if (this.maybeTouch) {
+      this.didTapDrop()
+    }
+    this.maybeTouch = false
   }
 }
 
