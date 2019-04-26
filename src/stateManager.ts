@@ -2,31 +2,27 @@ import { State } from "./App";
 import { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates } from "./GridCalculator";
 import _ from "lodash";
 import { stat } from "fs";
-import { Item } from "./Player";
+import { Item, Player } from "./Player";
 
 export type GameReducer = (state: State) => State
 
 export function moveLeft(state: State): State {
-  const newPlayer = { ...state.player, x: state.player.x - 1 }
-  const newState = tryToPickUpItems({ ...state, player: newPlayer }, state)
-  return stateIsValid(newState) ? newState : state
+  const player = { ...state.player, x: state.player.x - 1 }
+  return processPlayerChange(player, state)
 }
 export function moveRight(state: State): State {
-  const newPlayer = { ...state.player, x: state.player.x + 1 }
-  const newState = tryToPickUpItems({ ...state, player: newPlayer }, state)
-  return stateIsValid(newState) ? newState : state
+  const player = { ...state.player, x: state.player.x + 1 }
+  return processPlayerChange(player, state)
 }
 
 export function moveUp(state: State): State {
-  const newPlayer = { ...state.player, y: state.player.y + 1 }
-  const newState = tryToPickUpItems({ ...state, player: newPlayer }, state)
-  return stateIsValid(newState) ? newState : state
+  const player = { ...state.player, y: state.player.y + 1 }
+  return processPlayerChange(player, state)
 }
 
 export function moveDown(state: State): State {
-  const newPlayer = { ...state.player, y: state.player.y - 1 }
-  const newState = tryToPickUpItems({ ...state, player: newPlayer }, state)
-  return stateIsValid(newState) ? newState : state
+  const player = { ...state.player, y: state.player.y - 1 }
+  return processPlayerChange(player, state)
 }
 
 export function release(state: State): State {
@@ -48,6 +44,11 @@ export function release(state: State): State {
   } else {
     return state
   }
+}
+
+function processPlayerChange(player: Player, state: State): State {
+  const newState = tryToPickUpItems({ ...state, player }, state)
+  return stateIsValid(newState) ? newState : state
 }
 
 function stateIsValid(state: State): boolean {
