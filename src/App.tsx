@@ -56,10 +56,11 @@ class App extends React.Component<{}, State> {
         ]
       }],
       exits: [
-        { x: 1, y: -1 },
+        { x: 4, y: -1 },
         { x: 8, y: 7 },
         { x: 8, y: 6 },
         { x: -1, y: 2 },
+        { x: 4, y: 8 }
       ]
     }
   }

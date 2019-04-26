@@ -28,6 +28,15 @@ export default function (state: State): TileType[][] {
 
   let result: TileType[][] = []
 
+  function safeSet(x: number, y: number, type: TileType) {
+    if (x < -1
+      || x > size
+      || y < -1
+      || y > size) { return }
+
+    result[size - y][x + 1] = type
+  }
+
   for (let i = 0; i <= size + 1; i++) {
     result[i] = []
     for (let j = 0; j <= size + 1; j++) {
@@ -35,35 +44,35 @@ export default function (state: State): TileType[][] {
     }
   }
 
-  for (let i = 0; i <= size; i++) {
-    result[0][i] = TileType.HorizontalWall
-    result[size + 1][i] = TileType.HorizontalWall
+  for (let i = -1; i <= size; i++) {
+    safeSet(i, -1, TileType.HorizontalWall)
+    safeSet(i, size, TileType.HorizontalWall)
 
-    result[i][0] = TileType.VerticalWall
-    result[i][size + 1] = TileType.VerticalWall
+    safeSet(-1, i, TileType.VerticalWall)
+    safeSet(size, i, TileType.VerticalWall)
   }
 
-  result[size + 1][0] = TileType.BottomLeftCorner
-  result[size + 1][size + 1] = TileType.BottomRightCorner
-  result[0][0] = TileType.TopLeftCorner
-  result[0][size + 1] = TileType.TopRightCorner
+  safeSet(-1, -1, TileType.BottomLeftCorner)
+  safeSet(size, -1, TileType.BottomRightCorner)
+  safeSet(-1, size, TileType.TopLeftCorner)
+  safeSet(size, size, TileType.TopRightCorner)
 
   walls.forEach(w => {
-    result[size - w.y][w.x + 1] = TileType.Wall
+    safeSet(w.x, w.y, TileType.Wall)
   })
 
   exits.forEach(e => {
-    result[size - e.y][e.x + 1] = TileType.Door
+    safeSet(e.x, e.y, TileType.Door)
   })
 
   itemCoordinates(state).forEach(i => {
-    result[size - i.y][i.x + 1] = TileType.Item
+    safeSet(i.x, i.y, TileType.Item)
   })
 
   playerItemCoordinates(state).forEach(i => {
-    result[size - i.y][i.x + 1] = TileType.PlayerItem
+    safeSet(i.x, i.y, TileType.PlayerItem)
   })
-  result[size - player.y][player.x + 1] = TileType.Player
+  safeSet(player.x, player.y, TileType.Player)
 
   return result
 }
