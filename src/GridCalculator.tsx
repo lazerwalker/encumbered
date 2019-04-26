@@ -7,38 +7,59 @@ export enum TileType {
   Wall = "█",
   Player = "@",
   PlayerItem = "$",
-  Item = "!"
+  Item = "!",
+  Door = "#",
+
+  VerticalWall = "│",
+  HorizontalWall = "─",
+  TopLeftCorner = "┌",
+  TopRightCorner = "┐",
+  BottomLeftCorner = "└",
+  BottomRightCorner = "┘",
 }
 
 export interface GamePosition {
   x: number, y: number
 }
 
-// (0, 0) is top-left
+// (0, 0) is bottom-left
 export default function (state: State): TileType[][] {
-  const { size, walls, items, player } = state
+  const { size, walls, player } = state
 
   let result: TileType[][] = []
 
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i <= size + 1; i++) {
     result[i] = []
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j <= size + 1; j++) {
       result[i][j] = TileType.Floor
     }
   }
 
+  for (let i = 0; i <= size; i++) {
+    result[0][i] = TileType.HorizontalWall
+    result[size + 1][i] = TileType.HorizontalWall
+
+    result[i][0] = TileType.VerticalWall
+    result[i][size + 1] = TileType.VerticalWall
+  }
+
+  result[size + 1][0] = TileType.BottomLeftCorner
+  result[size + 1][size + 1] = TileType.BottomRightCorner
+  result[0][0] = TileType.TopLeftCorner
+  result[0][size + 1] = TileType.TopRightCorner
+
   walls.forEach(w => {
-    result[size - 1 - w.y][w.x] = TileType.Wall
+    result[size - w.y][w.x + 1] = TileType.Wall
   })
 
   itemCoordinates(state).forEach(i => {
-    result[size - 1 - i.y][i.x] = TileType.Item
+    result[size - i.y][i.x + 1] = TileType.Item
   })
 
   playerItemCoordinates(state).forEach(i => {
-    result[size - 1 - i.y][i.x] = TileType.PlayerItem
+    result[size - i.y][i.x + 1] = TileType.PlayerItem
   })
-  result[size - 1 - player.y][player.x] = TileType.Player
+  result[size - player.y][player.x + 1] = TileType.Player
 
   return result
 }
