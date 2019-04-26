@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import GridCalculator, { TileType } from './GridCalculator';
+import GridCalculator, { TileType, GamePosition } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
 
@@ -13,10 +13,11 @@ function print(tiles: TileType[][]): string {
 }
 
 export interface State {
+  exits: GamePosition[]
   player: Player
-  walls: { x: number, y: number }[]
   items: Item[]
   size: number
+  walls: GamePosition[]
 }
 
 class App extends React.Component<{}, State> {
@@ -53,7 +54,13 @@ class App extends React.Component<{}, State> {
           { x: 1, y: 0 },
           { x: 1, y: 1 }
         ]
-      }]
+      }],
+      exits: [
+        { x: 1, y: -1 },
+        { x: 8, y: 7 },
+        { x: 8, y: 6 },
+        { x: -1, y: 2 },
+      ]
     }
   }
 

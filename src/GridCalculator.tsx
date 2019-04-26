@@ -24,7 +24,7 @@ export interface GamePosition {
 
 // (0, 0) is bottom-left
 export default function (state: State): TileType[][] {
-  const { size, walls, player } = state
+  const { size, exits, walls, player } = state
 
   let result: TileType[][] = []
 
@@ -50,6 +50,10 @@ export default function (state: State): TileType[][] {
 
   walls.forEach(w => {
     result[size - w.y][w.x + 1] = TileType.Wall
+  })
+
+  exits.forEach(e => {
+    result[size - e.y][e.x + 1] = TileType.Door
   })
 
   itemCoordinates(state).forEach(i => {
