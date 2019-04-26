@@ -1,6 +1,7 @@
 import { Player, Item } from "./Player";
 import { State } from "./App";
 import _ from "lodash";
+import { switchStatement } from "@babel/types";
 
 export enum TileType {
   Floor = " ",
@@ -131,4 +132,10 @@ export function boundsCoordinates(state: State): GamePosition[] {
   }
 
   return _.differenceWith(result, state.exits, _.isEqual)
+}
+
+export function playerScoreForCurrentRoom(state: State): number {
+  return _(state.player.items)
+    .map(i => i.coordinates.length)
+    .sum() - 1
 }

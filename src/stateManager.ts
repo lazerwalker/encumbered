@@ -1,5 +1,5 @@
 import { State } from "./App";
-import GridCalculator, { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates, TileType } from "./GridCalculator";
+import GridCalculator, { playerItemCoordinates, GamePosition, itemCoordinates, coordinatesForItem, pickUpItem, dropItem, boundsCoordinates, TileType, playerScoreForCurrentRoom } from "./GridCalculator";
 import _ from "lodash";
 import { stat } from "fs";
 import { Item, Player } from "./Player";
@@ -55,6 +55,7 @@ function processPlayerChange(player: Player, oldState: State): State {
 
   if (hasExitedRoom(state)) {
     state.exited = true
+    state.score += playerScoreForCurrentRoom(state)
     return state
   }
 

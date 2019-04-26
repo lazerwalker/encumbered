@@ -18,6 +18,8 @@ export interface State {
   items: Item[]
   size: number
   walls: GamePosition[]
+
+  score: number,
   exited: boolean
 }
 
@@ -29,6 +31,7 @@ class App extends React.Component<{}, State> {
     this.state = {
       size: 8,
       exited: false,
+      score: 0,
       player: {
         x: 2,
         y: 2,
@@ -91,6 +94,7 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
+        <div id='score'>{this.state.score}</div>
         <pre>
           {print(grid)}
         </pre>
