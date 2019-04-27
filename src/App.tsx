@@ -37,26 +37,38 @@ class App extends React.Component<{}, State> {
       player: {
         x: 2,
         y: 2,
-        items: [{
-          x: 1,
-          y: 0,
-          coordinates: [{ x: 0, y: 0 }],
-          heldType: TileType.HeldItemSword,
-          type: TileType.ItemSword
-        }
-        ]
+        items: []
       },
       walls: [
         { x: 0, y: 0 },
         { x: 1, y: 0 }
       ],
-      items: [{
-        x: 4,
-        y: 4,
-        coordinates: [{ x: 0, y: 0 }],
-        type: TileType.ItemNormal,
-        heldType: TileType.HeldItemNormal
-      }],
+      items: [
+        {
+          x: 4,
+          y: 4,
+          type: TileType.ItemNormal,
+          heldType: TileType.HeldItemNormal
+        },
+        {
+          x: 2,
+          y: 2,
+          type: TileType.ItemSword,
+          heldType: TileType.HeldItemSword
+        },
+        {
+          x: 6,
+          y: 2,
+          type: TileType.ItemFragile,
+          heldType: TileType.HeldItemFragile
+        },
+        {
+          x: 1,
+          y: 3,
+          type: TileType.ItemPush,
+          heldType: TileType.HeldItemPush
+        }
+      ],
       exits: [
         { x: 4, y: -1 },
         { x: 8, y: 7 },
