@@ -6,10 +6,22 @@ import { switchStatement } from "@babel/types";
 export enum TileType {
   Floor = "&nbsp;",
   Wall = "█",
-  Player = "@",
+  Player = "<span style='background-color: #aaa'>@</span>",
+  Door = "#",
+
+  ItemSword = "<span style='color: red'>†</span>",
+  ItemFragile = "<span style='color: green'>$</span>",
+  ItemNormal = "<span style='color: lightblue'>!</span>",
+  ItemNoAttach = "<span style='color: yellow'>☯</span>",
+
+  HeldItemSword = "<span style='color: red; background-color: #aaa'>†</span>",
+  HeldItemFragile = "<span style='color: green; background-color: #aaa'>$</span>",
+  HeldItemNormal = "<span style='color: lightblue; background-color: #aaa'>!</span>",
+  HeldItemNoAttach = "<span style='color: yellow; background-color: #aaa'>☯</span>",
+
   PlayerItem = "$",
   Item = "!",
-  Door = "#",
+
 
   VerticalWall = "│",
   HorizontalWall = "─",
@@ -66,12 +78,12 @@ export default function (state: State): TileType[][] {
     safeSet(e.x, e.y, TileType.Door)
   })
 
-  itemCoordinates(state).forEach(i => {
-    safeSet(i.x, i.y, TileType.Item)
+  itemPositions(state).forEach(i => {
+    safeSet(i.x, i.y, i.type)
   })
 
-  playerItemCoordinates(state).forEach(i => {
-    safeSet(i.x, i.y, TileType.PlayerItem)
+  playerItemPositions(state).forEach(i => {
+    safeSet(i.x, i.y, i.heldType)
   })
   safeSet(player.x, player.y, TileType.Player)
 
@@ -104,9 +116,55 @@ export function dropItem(player: Player, item: Item): Item {
   }
 }
 
+/** HOPEFULLY TEMPORARY HACK */
+// This distinction between a GamePosition and an ItemPosition (the latter of which has a tile) is bad.
+interface ItemPosition {
+  x: number
+  y: number
+  heldType: TileType
+  type: TileType
+}
+
+export function itemPositions(state: State): ItemPosition[] {
+  return _.flatten(state.items.map(positionsForItem))
+}
+
 export function itemCoordinates(state: State): GamePosition[] {
   return _.flatten(state.items.map(coordinatesForItem))
 }
+
+export function positionsForItem(item: Item): ItemPosition[] {
+  let result: ItemPosition[] = []
+
+  item.coordinates.forEach(c => {
+    result.push({
+      y: item.y + c.y,
+      x: item.x + c.x,
+      type: item.type,
+      heldType: item.heldType
+    })
+  })
+
+  return result
+}
+
+export function playerItemPositions(state: State): ItemPosition[] {
+  let result: ItemPosition[] = []
+
+  state.player.items.forEach(i => {
+    i.coordinates.forEach(c => {
+      result.push({
+        x: state.player.x + i.x + c.x,
+        y: state.player.y + i.y + c.y, type: i.type,
+        heldType: i.heldType
+      })
+    })
+  })
+
+  return result
+}
+
+/** END HACK */
 
 export function playerItemCoordinates(state: State): GamePosition[] {
   let result: GamePosition[] = []

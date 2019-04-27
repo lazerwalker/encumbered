@@ -3,6 +3,7 @@ import './App.css';
 import GridCalculator, { TileType, GamePosition } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
+import { isTSMappedType } from '@babel/types';
 
 const nipplejs = require('nipplejs')
 
@@ -39,12 +40,9 @@ class App extends React.Component<{}, State> {
         items: [{
           x: 1,
           y: 0,
-          coordinates: [
-            { x: 0, y: 0 },
-            { x: 0, y: -1 },
-            { x: 1, y: 0 },
-            { x: 1, y: -1 }
-          ]
+          coordinates: [{ x: 0, y: 0 }],
+          heldType: TileType.HeldItemSword,
+          type: TileType.ItemSword
         }
         ]
       },
@@ -55,11 +53,9 @@ class App extends React.Component<{}, State> {
       items: [{
         x: 4,
         y: 4,
-        coordinates: [
-          { x: 0, y: 0 },
-          { x: 1, y: 0 },
-          { x: 1, y: 1 }
-        ]
+        coordinates: [{ x: 0, y: 0 }],
+        type: TileType.ItemNormal,
+        heldType: TileType.HeldItemNormal
       }],
       exits: [
         { x: 4, y: -1 },
