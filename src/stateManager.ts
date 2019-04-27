@@ -99,6 +99,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
   let destroyedItems: Item[] = []
   let pickedUpItems: Item[] = []
   let destroyedHeldItems: Item[] = []
+  let blocksToPush: [Item, GamePosition][] = []
 
   let stopMovement = false
 
@@ -123,6 +124,9 @@ function resolveItemCollisions(state: State, oldState: State): State {
       // Push the item, but don't pick it up
       // warning: need make sure we CAN move it
       // Also, if this is the only action that takes place, we probably want to move the player
+
+      const vector = { x: state.player.x - oldState.player.x, y: state.player.y - oldState.player.y }
+      blocksToPush.push([i, vector])
     } else if (heldItem.type === TileType.ItemSword) {
       // Destroy the item
       stopMovement = true
@@ -146,8 +150,46 @@ function resolveItemCollisions(state: State, oldState: State): State {
   if (stopMovement) {
     player.x = oldState.player.x
     player.y = oldState.player.y
-  } else {
+  } else if (blocksToPush.length > 0) {
+    // TODO: I'm not sure if this logic should live here.
+    // The check at the end to stop movement particularly smells like this belongs somewhere else.
+    let pushedBlocksToDelete: Item[] = []
+    let pushedBlocksToAdd: Item[] = []
+    const badCoordinates = [...boundsCoordinates(state), ...state.walls]
 
+    const move = (i: Item, vector: GamePosition): boolean => {
+      const newPosition = { x: i.x + vector.x, y: i.y + vector.y }
+      if (badCoordinates.find(c => c.x === newPosition.x && c.y === newPosition.y)) {
+        return false
+      }
+
+      let shouldPush = true
+
+      const existingItem = state.items.find(i => i.x === newPosition.x && i.y === newPosition.y)
+      if (existingItem) {
+        shouldPush = move(existingItem, vector)
+      }
+
+      if (shouldPush) {
+        pushedBlocksToDelete.push(i)
+        pushedBlocksToAdd.push({ ...i, x: i.x + vector.x, y: i.y + vector.y })
+      }
+
+      return shouldPush
+    }
+
+    blocksToPush.forEach(result => {
+      move(...result)
+    })
+
+    items = _.without(items, ...pushedBlocksToDelete)
+    items.push(...pushedBlocksToAdd)
+
+    if (pushedBlocksToDelete.length === 0) {
+      // We shouldn't move!
+      player.x = oldState.player.x
+      player.y = oldState.player.y
+    }
   }
 
   items = _.without(items, ...destroyedItems)
