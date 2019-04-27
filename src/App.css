@@ -4,10 +4,11 @@ body {
   position: fixed;
 }
 
-pre {
+#grid {
   background-color: #444;
   border: 1px solid black;
   color: #eee;
+  font-family: monospace;
   font-size: 60px;
   line-height: 60px;
   letter-spacing: 10px;

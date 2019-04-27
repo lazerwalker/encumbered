@@ -9,7 +9,7 @@ const nipplejs = require('nipplejs')
 function print(tiles: TileType[][]): string {
   return tiles
     .map(t => t.join(""))
-    .join("\n")
+    .join("<br/>")
 }
 
 export interface State {
@@ -101,9 +101,7 @@ class App extends React.Component<{}, State> {
     return (
       <div className="App">
         <div id='score'>{this.state.score}</div>
-        <pre>
-          {print(grid)}
-        </pre>
+        <div id='grid' dangerouslySetInnerHTML={{ __html: print(grid) }} />
         <button id='drop'>Drop</button>
       </div>
     );

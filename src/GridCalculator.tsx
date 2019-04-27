@@ -4,7 +4,7 @@ import _ from "lodash";
 import { switchStatement } from "@babel/types";
 
 export enum TileType {
-  Floor = " ",
+  Floor = "&nbsp;",
   Wall = "█",
   Player = "@",
   PlayerItem = "$",
