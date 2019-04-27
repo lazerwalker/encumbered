@@ -67,6 +67,12 @@ class App extends React.Component<{}, State> {
           y: 3,
           type: TileType.ItemPush,
           heldType: TileType.HeldItemPush
+        },
+        {
+          x: 5,
+          y: 5,
+          type: TileType.ItemBlock,
+          heldType: TileType.HeldItemBlock
         }
       ],
       exits: [

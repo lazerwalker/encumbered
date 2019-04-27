@@ -79,6 +79,18 @@ function avoidsWallCollisions(state: State): boolean {
     return false
   }
 
+  // Check if the player is holding any Block tiles
+  let blockTiles = state.player.items
+    .filter(i => i.type === TileType.ItemBlock)
+    .map(i => ({ x: i.x + state.player.x, y: i.y + state.player.y }))
+
+  for (let heldItem of blockTiles) {
+    let blocker = state.items.find(i => i.x === heldItem.x && i.y === heldItem.y)
+    if (blocker) {
+      return false
+    }
+  }
+
   return true
 }
 
@@ -88,11 +100,14 @@ function resolveItemCollisions(state: State, oldState: State): State {
   let pickedUpItems: Item[] = []
   let destroyedHeldItems: Item[] = []
 
+  let stopMovement = false
+
   // Player
   let i = _.find(state.items, i => i.x === player.x && i.y === player.y)
   if (i) {
     destroyedItems.push(i)
     pickedUpItems.push(pickUpItem(oldState.player, i))
+    stopMovement = true
   }
 
   player.items.forEach(heldItem => {
@@ -100,43 +115,46 @@ function resolveItemCollisions(state: State, oldState: State): State {
     if (!i) { return }
 
     if (heldItem.type === TileType.ItemNormal) {
-      console.log("Normal item!")
       // Just pick up the item
+      stopMovement = true
       destroyedItems.push(i)
       pickedUpItems.push(pickUpItem(oldState.player, i))
     } else if (heldItem.type === TileType.ItemPush) {
-      console.log("Push item")
       // Push the item, but don't pick it up
       // warning: need make sure we CAN move it
       // Also, if this is the only action that takes place, we probably want to move the player
     } else if (heldItem.type === TileType.ItemSword) {
-      console.log("Sword item")
       // Destroy the item
+      stopMovement = true
       destroyedItems.push(i)
-    } if (heldItem.type === TileType.ItemFragile) {
-      console.log("Fragile item")
+    } else if (heldItem.type === TileType.ItemFragile) {
       // Replace the held item with the new one 
-      destroyedItems.push(i)
+      stopMovement = true
 
+      destroyedItems.push(i)
       destroyedHeldItems.push(heldItem)
 
       const newItem = { ...i, x: heldItem.x, y: heldItem.y }
       pickedUpItems.push(newItem)
+    } else if (heldItem.type === TileType.ItemBlock) {
+      // Handled in collision detection
     }
   })
 
-  if (pickedUpItems.length > 0 || destroyedItems.length > 0) {
+  let items = state.items
+
+  if (stopMovement) {
     player.x = oldState.player.x
     player.y = oldState.player.y
-
-    const items = _.without(state.items, ...destroyedItems)
-    player.items.push(...pickedUpItems)
-    player.items = _.without(player.items, ...destroyedHeldItems)
-
-    return { ...state, player, items }
   } else {
-    return state
+
   }
+
+  items = _.without(items, ...destroyedItems)
+  player.items.push(...pickedUpItems)
+  player.items = _.without(player.items, ...destroyedHeldItems)
+
+  return { ...state, player, items }
 }
 
 function hasExitedRoom(state: State): boolean {
