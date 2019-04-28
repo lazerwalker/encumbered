@@ -1185,6 +1185,11 @@
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.1.tgz#42995b446db9a48a11a07ec083499a860e9138ff"
   integrity sha512-hRJD2ahnnpLgsj6KWMYSrmXkM3rm2Dl1qkx6IOFD5FnuNPXJIG5L0dhgKXCYTRMGzU4n0wImQ/xfmRc4POUFlg==
 
+"@types/javascript-astar@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@types/javascript-astar/-/javascript-astar-0.0.30.tgz#4572583915e5d4323c4c1f0a56b0fb94e96d31dc"
+  integrity sha512-Og0XLNWGBbc3fvQICNL/Q7sAzhfBIZLhR3jwth+fAe8NVkKfKFUwiBGpx7MS6imfSlbgo2ymossq5B+gUpprog==
+
 "@types/jest-diff@*":
   version "20.0.1"
   resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
@@ -5280,6 +5285,11 @@ istanbul-reports@^2.2.3:
   integrity sha512-T6EbPuc8Cb620LWAYyZ4D8SSn06dY9i1+IgUX2lTH8gbwflMc9Obd33zHTyNX653ybjpamAHS9toKS3E6cGhTw==
   dependencies:
     handlebars "^4.1.0"
+
+javascript-astar@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/javascript-astar/-/javascript-astar-0.4.1.tgz#e49dd9a1535c9a98675091f7258e69d983811703"
+  integrity sha1-5J3ZoVNcmphnUJH3JY5p2YOBFwM=
 
 jest-changed-files@^24.7.0:
   version "24.7.0"
