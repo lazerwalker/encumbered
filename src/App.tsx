@@ -3,7 +3,7 @@ import './App.css';
 import GridCalculator, { TileType, GamePosition } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
-import { isTSMappedType } from '@babel/types';
+import _ from 'lodash';
 
 const nipplejs = require('nipplejs')
 
@@ -127,8 +127,13 @@ class App extends React.Component<{}, State> {
   }
 
   perform = (action: GameReducer, state: State = this.state): State => {
-    this.undoStack.push(action)
-    return action(state)
+    let result = action(state)
+
+    if (!_.isEqual(result, state)) {
+      this.undoStack.push(action)
+    }
+
+    return result
   }
 
   handleJoystickMove = (e: any) => {
