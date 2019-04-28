@@ -104,7 +104,3 @@ export function boundsCoordinates(state: State): GamePosition[] {
 
   return _.differenceWith(result, state.exits, _.isEqual)
 }
-
-export function playerScoreForCurrentRoom(state: State): number {
-  return state.player.items.length - 1
-}

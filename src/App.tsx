@@ -20,8 +20,8 @@ export interface State {
   size: number
   walls: GamePosition[]
 
-  score: number,
-  exited: boolean
+  exited: boolean,
+
 }
 
 class App extends React.Component<{}, State> {
@@ -36,7 +36,6 @@ class App extends React.Component<{}, State> {
     this.initialState = {
       size: 8,
       exited: false,
-      score: 0,
       player: {
         x: 2,
         y: 2,
@@ -117,9 +116,11 @@ class App extends React.Component<{}, State> {
     let grid = GridCalculator(this.state)
     print(grid)
 
+    const score = this.state.player.items.filter(i => i.type === TileType.ItemMoney).length
+
     return (
       <div className="App">
-        <div id='score'>{this.state.score}</div>
+        <div id='score'>{score}</div>
         <div id='grid' dangerouslySetInnerHTML={{ __html: print(grid) }} />
         <button id='drop'>Drop</button>
       </div>

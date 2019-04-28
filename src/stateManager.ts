@@ -1,5 +1,5 @@
 import { State } from "./App";
-import GridCalculator, { GamePosition, boundsCoordinates, TileType, playerScoreForCurrentRoom } from "./GridCalculator";
+import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./GridCalculator";
 import _ from "lodash";
 import { Item, Player } from "./Player";
 
@@ -55,8 +55,6 @@ function processPlayerChange(player: Player, oldState: State): State {
 
   if (hasExitedRoom(state)) {
     state.exited = true
-    state.score += playerScoreForCurrentRoom(state)
-    return state
   }
 
   return state
@@ -131,7 +129,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
       // Destroy the item
       stopMovement = true
       destroyedItems.push(i)
-    } else if (heldItem.type === TileType.ItemMoney {
+    } else if (heldItem.type === TileType.ItemMoney) {
       // Replace the held item with the new one 
       stopMovement = true
 
