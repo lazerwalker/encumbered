@@ -62,8 +62,8 @@ class App extends React.Component<{}, State> {
         {
           x: 6,
           y: 2,
-          type: TileType.ItemFragile,
-          heldType: TileType.HeldItemFragile
+          type: TileType.ItemMoney,
+          heldType: TileType.HeldItemMoney
         },
         {
           x: 1,

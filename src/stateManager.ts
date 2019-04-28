@@ -131,7 +131,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
       // Destroy the item
       stopMovement = true
       destroyedItems.push(i)
-    } else if (heldItem.type === TileType.ItemFragile) {
+    } else if (heldItem.type === TileType.ItemMoney {
       // Replace the held item with the new one 
       stopMovement = true
 

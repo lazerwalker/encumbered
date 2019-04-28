@@ -8,14 +8,14 @@ export enum TileType {
   Door = "#",
 
   ItemSword = "<span style='color: red'>†</span>",
-  ItemFragile = "<span style='color: green'>$</span>",
+  ItemMoney = "<span style='color: green'>$</span>",
   ItemNormal = "<span style='color: lightblue'>!</span>",
   ItemPush = "<span style='color: yellow'>O</span>",
   ItemBlock = "<span style='color: saddlebrown'>+</span>",
 
 
   HeldItemSword = "<span style='color: red; background-color: #aaa'>†</span>",
-  HeldItemFragile = "<span style='color: green; background-color: #aaa'>$</span>",
+  HeldItemMoney = "<span style='color: green; background-color: #aaa'>$</span>",
   HeldItemNormal = "<span style='color: lightblue; background-color: #aaa'>!</span>",
   HeldItemPush = "<span style='color: yellow; background-color: #aaa'>O</span>",
   HeldItemBlock = "<span style='color: saddlebrown; background-color: #aaa''>+</span>",
