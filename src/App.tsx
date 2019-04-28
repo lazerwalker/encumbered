@@ -28,9 +28,12 @@ class App extends React.Component<{}, State> {
   joystickTimerId: NodeJS.Timeout | undefined
   maybeTouch: boolean = false
 
+  initialState: State
+  undoStack: GameReducer[] = []
+
   constructor(props: any) {
     super(props)
-    this.state = {
+    this.initialState = {
       size: 8,
       exited: false,
       score: 0,
@@ -83,6 +86,8 @@ class App extends React.Component<{}, State> {
         { x: 4, y: 8 }
       ]
     }
+
+    this.state = { ...this.initialState }
   }
 
   componentDidMount() {
@@ -121,6 +126,11 @@ class App extends React.Component<{}, State> {
     );
   }
 
+  perform = (action: GameReducer, state: State = this.state): State => {
+    this.undoStack.push(action)
+    return action(state)
+  }
+
   handleJoystickMove = (e: any) => {
     if (this.joystickTimerId) {
       clearTimeout(this.joystickTimerId)
@@ -140,13 +150,12 @@ class App extends React.Component<{}, State> {
     }
 
     const repeat = () => {
-      this.setState(result(this.state))
+      this.setState(this.perform(result))
       this.joystickTimerId = setTimeout(repeat, 150)
     }
 
     this.joystickTimerId = setTimeout(repeat, 300)
-
-    this.setState(result(this.state))
+    this.setState(this.perform(result))
   }
 
   handleJoystickEnd = (e: any) => {
@@ -163,17 +172,28 @@ class App extends React.Component<{}, State> {
       "ArrowRight": moveRight,
       "Space": release
     }
+
+    if (e.code === 'KeyU' || e.code === "KeyZ") {
+      let state = { ...this.initialState }
+      this.undoStack.pop()
+      for (let a of this.undoStack) {
+        state = a(state)
+      }
+      this.setState(state)
+      return
+    }
+
     const result = keyMap[e.code];
     if (!result) {
       console.log("COULD NOT FIND HANDLER", e)
       return
     }
 
-    this.setState(result(this.state))
+    this.setState(this.perform(result))
   }
 
   didTapDrop = () => {
-    this.setState(release(this.state))
+    this.setState(this.perform(release))
   }
 
   handleTouchStart = (e: any) => {
