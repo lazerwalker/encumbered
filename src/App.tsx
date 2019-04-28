@@ -20,8 +20,10 @@ export interface State {
   size: number
   walls: GamePosition[]
 
-  exited: boolean,
+  hp: number
+  maxHP: number
 
+  exited: boolean
 }
 
 class App extends React.Component<{}, State> {
@@ -36,6 +38,8 @@ class App extends React.Component<{}, State> {
     this.initialState = {
       size: 8,
       exited: false,
+      hp: 3,
+      maxHP: 3,
       player: {
         x: 2,
         y: 2,
@@ -120,7 +124,7 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <div id='score'>{score}</div>
+        <div id='score-and-hp'>{score} | {this.state.hp}/{this.state.maxHP}</div>
         <div id='grid' dangerouslySetInnerHTML={{ __html: print(grid) }} />
         <button id='drop'>Drop</button>
       </div>
