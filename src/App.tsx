@@ -18,6 +18,7 @@ export interface State {
   player: Player
   items: Item[]
   size: number
+  enemies: GamePosition[]
   walls: GamePosition[]
 
   hp: number
@@ -45,6 +46,9 @@ class App extends React.Component<{}, State> {
         y: 2,
         items: []
       },
+      enemies: [
+        { x: 7, y: 7 }
+      ],
       walls: [
         { x: 0, y: 0 },
         { x: 1, y: 0 }
@@ -57,7 +61,7 @@ class App extends React.Component<{}, State> {
           heldType: TileType.HeldItemNormal
         },
         {
-          x: 2,
+          x: 3,
           y: 2,
           type: TileType.ItemSword,
           heldType: TileType.HeldItemSword

@@ -1,7 +1,9 @@
 import { State } from "./App";
 import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./GridCalculator";
-import _ from "lodash";
 import { Item, Player } from "./Player";
+
+import _ from "lodash";
+const { astar, Graph } = require('javascript-astar')
 
 export type GameReducer = (state: State) => State
 
@@ -46,7 +48,7 @@ export function release(state: State): State {
 }
 
 function processPlayerChange(player: Player, oldState: State): State {
-  const state = resolveItemCollisions({ ...oldState, player }, oldState)
+  let state = resolveItemCollisions({ ...oldState, player }, oldState)
 
   if (!avoidsWallCollisions(state)) {
     console.log("Wall?")
@@ -55,6 +57,49 @@ function processPlayerChange(player: Player, oldState: State): State {
 
   if (hasExitedRoom(state)) {
     state.exited = true
+  }
+
+  state = moveEnemies(state)
+
+  return state
+}
+
+function moveEnemies(state: State): State {
+  let newState = { ...state }
+
+  let wallTypes = [TileType.Wall, TileType.VerticalWall, TileType.HorizontalWall]
+
+  for (const enemy of newState.enemies) {
+    let graph: number[][] = []
+    let grid = GridCalculator(state)
+    for (let i = 0; i < grid.length; i++) {
+      graph.push([])
+      for (let j = 0; j < grid[i].length; j++) {
+        if (_.includes(wallTypes, grid[i][j])) {
+          console.log(i, j, grid[i][j])
+          graph[i][j] = 0
+        } else {
+          graph[i][j] = 1
+        }
+      }
+    }
+    graph = graph.reverse() // Our y-axis is reversed
+
+    let searchGraph = new Graph(graph)
+
+    const result = astar.search(
+      searchGraph,
+      searchGraph.grid[enemy.x + 1][enemy.y + 1],
+      searchGraph.grid[state.player.x + 1][state.player.y + 1],
+      { heuristic: astar.heuristics.manhattan }
+    );
+
+    if (result.length > 0) {
+      enemy.x = result[0].x - 1
+      enemy.y = result[0].y - 1
+
+      // Process collisions
+    }
   }
 
   return state
