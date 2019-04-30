@@ -76,7 +76,6 @@ function moveEnemies(state: State): State {
       graph.push([])
       for (let j = 0; j < grid[i].length; j++) {
         if (_.includes(wallTypes, grid[i][j])) {
-          console.log(i, j, grid[i][j])
           graph[i][j] = 0
         } else {
           graph[i][j] = 1
@@ -97,8 +96,10 @@ function moveEnemies(state: State): State {
     if (result.length > 0) {
       enemy.x = result[0].x - 1
       enemy.y = result[0].y - 1
+    }
 
-      // Process collisions
+    if (state.player.x === enemy.x && state.player.y === enemy.y) {
+      state.gameOver = true
     }
   }
 

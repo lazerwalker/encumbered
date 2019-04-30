@@ -25,6 +25,7 @@ export interface State {
   maxHP: number
 
   exited: boolean
+  gameOver: boolean
 }
 
 class App extends React.Component<{}, State> {
@@ -39,6 +40,7 @@ class App extends React.Component<{}, State> {
     this.initialState = {
       size: 8,
       exited: false,
+      gameOver: false,
       hp: 3,
       maxHP: 3,
       player: {
@@ -94,7 +96,7 @@ class App extends React.Component<{}, State> {
       ]
     }
 
-    this.state = { ...this.initialState }
+    this.state = _.cloneDeep(this.initialState)
   }
 
   componentDidMount() {
@@ -140,6 +142,12 @@ class App extends React.Component<{}, State> {
 
     if (!_.isEqual(result, state)) {
       this.undoStack.push(action)
+    }
+
+    // TODO: This should live elsewhere
+    if (result.gameOver) {
+      console.log(result, this.initialState)
+      return _.cloneDeep(this.initialState)
     }
 
     return result
@@ -188,7 +196,7 @@ class App extends React.Component<{}, State> {
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {
-      let state = { ...this.initialState }
+      let state = _.cloneDeep(this.initialState)
       this.undoStack.pop()
       for (let a of this.undoStack) {
         state = a(state)
