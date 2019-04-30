@@ -65,13 +65,13 @@ function processPlayerChange(player: Player, oldState: State): State {
 }
 
 function moveEnemies(state: State): State {
-  let newState = { ...state }
+  let newState = _.cloneDeep(state)
 
   let wallTypes = [TileType.Wall, TileType.VerticalWall, TileType.HorizontalWall]
 
   for (const enemy of newState.enemies) {
     let graph: number[][] = []
-    let grid = GridCalculator(state)
+    let grid = GridCalculator(newState)
     for (let i = 0; i < grid.length; i++) {
       graph.push([])
       for (let j = 0; j < grid[i].length; j++) {
@@ -94,16 +94,30 @@ function moveEnemies(state: State): State {
     );
 
     if (result.length > 0) {
-      enemy.x = result[0].x - 1
-      enemy.y = result[0].y - 1
+      const newPos = { x: result[0].x - 1, y: result[0].y - 1 }
+      enemy.x = newPos.x
+      enemy.y = newPos.y
+    }
+
+    const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
+    if (item) {
+      newState.enemies = _.without(newState.enemies, enemy)
+      newState.tiredEnemies.push(enemy)
+      newState.player.items = _.without(newState.player.items, item)
     }
 
     if (state.player.x === enemy.x && state.player.y === enemy.y) {
-      state.gameOver = true
+      newState.gameOver = true
     }
   }
 
-  return state
+  for (const tiredEnemy of state.tiredEnemies) {
+    newState.tiredEnemies = _.without(newState.enemies, tiredEnemy)
+    newState.enemies.push(tiredEnemy)
+  }
+
+  console.log(newState)
+  return newState
 }
 
 function avoidsWallCollisions(state: State): boolean {

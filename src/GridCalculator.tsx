@@ -8,6 +8,7 @@ export enum TileType {
   Door = "#",
 
   Enemy = "<span style='color: red'>k</span>",
+  EnemyTired = "<span style='color: darkred'>k</span>",
 
   ItemSword = "<span style='color: red'>†</span>",
   ItemMoney = "<span style='color: green'>$</span>",
@@ -40,7 +41,7 @@ export interface GamePosition {
 
 // (0, 0) is bottom-left
 export default function (state: State): TileType[][] {
-  const { size, enemies, exits, walls, player } = state
+  const { size, enemies, tiredEnemies, exits, walls, player } = state
 
   let result: TileType[][] = []
 
@@ -89,6 +90,10 @@ export default function (state: State): TileType[][] {
     safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType)
   })
   safeSet(player.x, player.y, TileType.Player)
+
+  tiredEnemies.forEach(e => {
+    safeSet(e.x, e.y, TileType.EnemyTired)
+  })
 
   enemies.forEach(e => {
     safeSet(e.x, e.y, TileType.Enemy)

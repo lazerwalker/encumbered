@@ -19,6 +19,7 @@ export interface State {
   items: Item[]
   size: number
   enemies: GamePosition[]
+  tiredEnemies: GamePosition[]
   walls: GamePosition[]
 
   hp: number
@@ -51,6 +52,7 @@ class App extends React.Component<{}, State> {
       enemies: [
         { x: 7, y: 7 }
       ],
+      tiredEnemies: [],
       walls: [
         { x: 0, y: 0 },
         { x: 1, y: 0 }
