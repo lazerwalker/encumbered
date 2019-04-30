@@ -67,7 +67,12 @@ function processPlayerChange(player: Player, oldState: State): State {
 function moveEnemies(state: State): State {
   let newState = _.cloneDeep(state)
 
-  let wallTypes = [TileType.Wall, TileType.VerticalWall, TileType.HorizontalWall]
+  let wallTypes = [
+    TileType.Wall,
+    TileType.VerticalWall,
+    TileType.HorizontalWall,
+    TileType.HeldItemSword
+  ]
 
   for (const enemy of newState.enemies) {
     let graph: number[][] = []
