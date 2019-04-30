@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import GridCalculator, { TileType, GamePosition } from './GridCalculator';
 import { Player, Item } from './Player';
-import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release } from './stateManager';
+import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
 
 const nipplejs = require('nipplejs')
@@ -194,7 +194,8 @@ class App extends React.Component<{}, State> {
       "ArrowDown": moveDown,
       "ArrowLeft": moveLeft,
       "ArrowRight": moveRight,
-      "Space": release
+      "Space": release,
+      "Period": wait
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {

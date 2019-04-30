@@ -26,6 +26,10 @@ export function moveDown(state: State): State {
   return processPlayerChange(player, state)
 }
 
+export function wait(state: State): State {
+  return processPlayerChange(state.player, state)
+}
+
 export function release(state: State): State {
   let newItems: Item[] = [...state.items]
   let playerItems = state.player.items
