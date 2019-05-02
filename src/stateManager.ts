@@ -79,12 +79,12 @@ function moveEnemies(state: State): State {
   ]
 
   for (const enemy of newState.enemies) {
-    let graph: number[][] = []
+    let graph: number[][] = [[]]
     let grid = GridCalculator(newState)
-    for (let i = 0; i < grid.length; i++) {
+    for (let i = 0; i < grid.length - 2; i++) {
       graph.push([])
-      for (let j = 0; j < grid[i].length; j++) {
-        if (_.includes(wallTypes, grid[i][j])) {
+      for (let j = 0; j < grid[i].length - 2; j++) {
+        if (_.includes(wallTypes, grid[i + 1][j + 1])) {
           graph[i][j] = 0
         } else {
           graph[i][j] = 1
@@ -92,21 +92,30 @@ function moveEnemies(state: State): State {
       }
     }
     graph = graph.reverse() // Our y-axis is reversed
+    graph.shift()
 
+
+    console.log("%cPathfinding Grid", "font-weight: bold")
+    console.log(`%c${graph.map((g, i) => `${i}: ${g.join("")}`).join("\n")}`, "font-family: monospace")
     let searchGraph = new Graph(graph)
 
+    console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
     const result = astar.search(
       searchGraph,
-      searchGraph.grid[enemy.x + 1][enemy.y + 1],
-      searchGraph.grid[state.player.x + 1][state.player.y + 1],
+      searchGraph.grid[enemy.y][enemy.x],
+      searchGraph.grid[state.player.y][state.player.x],
       { heuristic: astar.heuristics.manhattan }
     );
 
+    console.log(result.map((r: any) => `(${r.x}, ${r.y})`).join(" "))
+
     if (result.length > 0) {
-      const newPos = { x: result[0].x - 1, y: result[0].y - 1 }
+      const newPos = { x: result[0].y, y: result[0].x }
       enemy.x = newPos.x
       enemy.y = newPos.y
+      console.log(newPos)
     }
+
 
     const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
     if (item) {
