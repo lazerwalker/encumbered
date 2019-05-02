@@ -176,6 +176,7 @@ function avoidsWallCollisions(state: State): boolean {
 
 function resolveItemCollisions(state: State, oldState: State): State {
   let player = state.player
+  let enemies = _.cloneDeep(state.enemies)
   let destroyedItems: Item[] = []
   let pickedUpItems: Item[] = []
   let destroyedHeldItems: Item[] = []
@@ -192,37 +193,23 @@ function resolveItemCollisions(state: State, oldState: State): State {
   }
 
   player.items.forEach(heldItem => {
+    // Pick up items
     let i = _.find(state.items, i => i.x === heldItem.x + player.x && i.y === heldItem.y + player.y)
-    if (!i) { return }
-
-    if (heldItem.type === TileType.ItemNormal) {
-      // Just pick up the item
+    if (i) {
       stopMovement = true
       destroyedItems.push(i)
       pickedUpItems.push(pickUpItem(oldState.player, i))
-    } else if (heldItem.type === TileType.ItemPush) {
-      // Push the item, but don't pick it up
-      // warning: need make sure we CAN move it
-      // Also, if this is the only action that takes place, we probably want to move the player
-
-      const vector = { x: state.player.x - oldState.player.x, y: state.player.y - oldState.player.y }
-      blocksToPush.push([i, vector])
-    } else if (heldItem.type === TileType.ItemSword) {
-      // Destroy the item
-      stopMovement = true
-      destroyedItems.push(i)
-    } else if (heldItem.type === TileType.ItemMoney) {
-      // Replace the held item with the new one 
-      stopMovement = true
-
-      destroyedItems.push(i)
-      destroyedHeldItems.push(heldItem)
-
-      const newItem = { ...i, x: heldItem.x, y: heldItem.y }
-      pickedUpItems.push(newItem)
-    } else if (heldItem.type === TileType.ItemBlock) {
-      // Handled in collision detection
     }
+
+    // TODO: Process sword collision with enemy
+    if (heldItem.type == TileType.ItemSword) {
+      let e = _.find(enemies, e => e.x === heldItem.x + player.x && e.y === heldItem.y + player.y)
+      if (e) {
+        enemies = _.without(enemies, e)
+        stopMovement = true
+      }
+    }
+
   })
 
   let items = state.items
@@ -276,7 +263,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
   player.items.push(...pickedUpItems)
   player.items = _.without(player.items, ...destroyedHeldItems)
 
-  return { ...state, player, items }
+  return { ...state, player, enemies, items }
 }
 
 function hasExitedRoom(state: State): boolean {
