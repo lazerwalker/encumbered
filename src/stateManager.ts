@@ -200,10 +200,11 @@ function resolveItemCollisions(state: State, oldState: State): State {
       pickedUpItems.push(pickUpItem(oldState.player, i))
     }
 
-    // TODO: Process sword collision with enemy
+    // Kill enemy!
     if (heldItem.type == TileType.ItemSword) {
       let e = _.find(enemies, e => e.x === heldItem.x + player.x && e.y === heldItem.y + player.y)
       if (e) {
+        destroyedHeldItems.push(heldItem)
         enemies = _.without(enemies, e)
         stopMovement = true
       }
