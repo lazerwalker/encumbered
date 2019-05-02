@@ -111,18 +111,22 @@ function moveEnemies(state: State): State {
 
     if (result.length > 0) {
       const newPos = { x: result[0].y, y: result[0].x }
+      const oldPos = { x: enemy.x, y: enemy.y }
       enemy.x = newPos.x
       enemy.y = newPos.y
       console.log(newPos)
-    }
 
 
-    const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
-    if (item) {
-      newState.enemies = _.without(newState.enemies, enemy)
-      newState.tiredEnemies.push(enemy)
-      newState.player.items = _.without(newState.player.items, item)
+      const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
+      if (item) {
+        newState.enemies = _.without(newState.enemies, enemy)
+        enemy.x = oldPos.x
+        enemy.y = oldPos.y
+        newState.tiredEnemies.push(enemy)
+        newState.player.items = _.without(newState.player.items, item)
+      }
     }
+
 
     if (state.player.x === enemy.x && state.player.y === enemy.y) {
       newState.gameOver = true
