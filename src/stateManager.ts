@@ -84,6 +84,21 @@ function moveEnemies(state: State): State {
   ]
 
   for (const enemy of newState.currentRoom.enemies) {
+    // Before moving:
+    // It's possible that the player moved one of their items into the enemy.
+    // If that's the case, resolve that rather than do anything fancier.
+    // (We could resolve this when we resolve item movement, but that also feels weird?)
+    const item = newState.player.items.find(i => i.x + newState.player.x === enemy.x && i.y + newState.player.y === enemy.y)
+    if (item) {
+      newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
+      newState.currentRoom.tiredEnemies.push(enemy)
+      newState.player.items = _.without(newState.player.items, item)
+      continue
+    }
+
+    // Okay, now that's over with, let's do normal pathfinding.
+
+    // TODO: Here's where the frustrating math changes need to go to allow players to be in doorways
     let graph: number[][] = [[]]
     let grid = GridCalculator(newState)
     for (let i = 0; i < grid.length - 2; i++) {
@@ -122,6 +137,14 @@ function moveEnemies(state: State): State {
       enemy.y = newPos.y
       console.log(newPos)
 
+      if (state.player.x === enemy.x && state.player.y === enemy.y) {
+        newState.hp -= 1
+        enemy.x = oldPos.x
+        enemy.y = oldPos.y
+        if (newState.hp <= 0) {
+          newState.gameOver = true
+        }
+      }
 
       const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
       if (item) {
@@ -135,10 +158,6 @@ function moveEnemies(state: State): State {
           newState.player.items = _.without(newState.player.items, item)
         }
       }
-    }
-
-    if (state.player.x === enemy.x && state.player.y === enemy.y) {
-      newState.gameOver = true
     }
   }
 
