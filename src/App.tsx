@@ -1,17 +1,29 @@
 import React from 'react';
 import './App.css';
-import GridCalculator, { TileType, GamePosition } from './GridCalculator';
+import GridCalculator, { TileType } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
 import { Room, generateRoom } from './Room';
+import EditorButton from './components/EditorButton'
 
 const nipplejs = require('nipplejs')
 
-function print(tiles: TileType[][]): string {
-  return tiles
-    .map(t => t.join(""))
-    .join("<br/>")
+// TODO: Looool, this should be properly React Component-ified
+const printGrid = (props: { tiles: TileType[][], size: number, onClick: (x: number, y: number) => void }) => {
+  const grid = props.tiles.map((row, rowIdx) => {
+    const mappedRow = row.map((tile, colIdx) => {
+      return <span
+        data-x={colIdx - 1}
+        data-y={props.size - rowIdx}
+        dangerouslySetInnerHTML={{ __html: tile }}
+        onClick={() => props.onClick(colIdx - 1, props.size - rowIdx)}
+      />
+    })
+    return <div>{mappedRow}</div>
+  })
+
+  return <div id='grid'>{grid}</div>
 }
 
 export interface State {
@@ -23,6 +35,8 @@ export interface State {
 
   exited: boolean
   gameOver: boolean
+
+  selectedEditorButton?: TileType
 }
 
 class App extends React.Component<{}, State> {
@@ -74,16 +88,30 @@ class App extends React.Component<{}, State> {
   }
 
   render() {
-    let grid = GridCalculator(this.state)
-    print(grid)
+    const grid = printGrid({ tiles: GridCalculator(this.state), size: this.state.currentRoom.size, onClick: this.handleEditorBoardClick })
 
     const score = this.state.player.items.filter(i => i.type === TileType.ItemMoney).length
+
+    const editorButtons = [
+      TileType.Player,
+      TileType.Enemy,
+      TileType.ItemBlock,
+      TileType.ItemMoney,
+      TileType.ItemNormal,
+      TileType.ItemSword,
+      TileType.Wall,
+      TileType.Door
+    ].map(t => <EditorButton type={t} onClick={this.handleEditorButtonClick} selected={this.state.selectedEditorButton === t} />)
 
     return (
       <div className="App">
         <div id='score-and-hp'>${score} | {this.state.hp}/{this.state.maxHP}</div>
-        <div id='grid' dangerouslySetInnerHTML={{ __html: print(grid) }} />
+        {grid}
         <button id='drop'>Drop</button>
+
+        <div id='level-editor'>
+          {editorButtons}
+        </div>
       </div>
     );
   }
@@ -183,6 +211,56 @@ class App extends React.Component<{}, State> {
       this.didTapDrop()
     }
     this.maybeTouch = false
+  }
+
+  handleEditorButtonClick = (t: TileType) => {
+    this.setState({ selectedEditorButton: t })
+  }
+
+  handleEditorBoardClick = (x: number, y: number) => {
+    const type = this.state.selectedEditorButton
+    if (!type) return
+
+    if (type === TileType.Player) {
+      this.setState({
+        selectedEditorButton: undefined,
+        player: { ...this.state.player, x, y }
+      })
+    } else if (type === TileType.Enemy) {
+      const enemies = [...this.state.currentRoom.enemies, { x, y, type }]
+      this.setState({
+        selectedEditorButton: undefined,
+        currentRoom: { ...this.state.currentRoom, enemies }
+      })
+    } else if (type === TileType.Door) {
+      const exits = [...this.state.currentRoom.exits, { x, y }]
+      this.setState({
+        selectedEditorButton: undefined,
+        currentRoom: { ...this.state.currentRoom, exits }
+      })
+    } else if (type === TileType.Wall) {
+      const walls = [...this.state.currentRoom.walls, { x, y }]
+      this.setState({
+        selectedEditorButton: undefined,
+        currentRoom: { ...this.state.currentRoom, walls }
+      })
+    } else {
+      const heldType = (type: TileType): TileType => {
+        if (type === TileType.ItemBlock) return TileType.HeldItemBlock
+        if (type === TileType.ItemNormal) return TileType.HeldItemNormal
+        if (type === TileType.ItemMoney) return TileType.HeldItemMoney
+        if (type === TileType.ItemSword) return TileType.HeldItemSword
+        if (type === TileType.ItemPush) return TileType.HeldItemPush
+        return type
+      }
+
+      const item = { x, y, type, heldType: heldType(type) }
+      const items = [...this.state.currentRoom.items, item]
+      this.setState({
+        selectedEditorButton: undefined,
+        currentRoom: { ...this.state.currentRoom, items }
+      })
+    }
   }
 }
 

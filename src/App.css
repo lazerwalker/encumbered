@@ -4,6 +4,30 @@ body {
   position: fixed;
 }
 
+#level-editor {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  height: 100vh;
+}
+
+#level-editor div {
+  background-color: #aaa;
+  border: 1px solid #444;
+  color: white;
+  font-family: monospace;
+  font-size: 60px;
+  height: 70px;
+  margin: 10px;
+  width: 70px;
+}
+
+#level-editor div.selected {
+  background-color: white;
+  border-color: #999;
+  color: black;
+}
+
 #grid {
   background-color: #444;
   border: 1px solid black;
