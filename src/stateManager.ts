@@ -127,7 +127,6 @@ function moveEnemies(state: State): State {
       }
     }
 
-
     if (state.player.x === enemy.x && state.player.y === enemy.y) {
       newState.gameOver = true
     }

@@ -13,7 +13,7 @@ export interface Room {
   walls: GamePosition[]
 }
 
-export function generateRoom(entrance: GamePosition): Room {
+export function generateRoom(entrance: GamePosition[]): Room {
   const size = 8
 
   let allCoordinates: GamePosition[] = []
@@ -33,9 +33,35 @@ export function generateRoom(entrance: GamePosition): Room {
     items.push(randomItem(pos))
   }
 
+  let exits = [...entrance]
+  const directions: GamePosition[] = _.shuffle([
+    { x: -1, y: Infinity },
+    { x: size, y: Infinity },
+    { x: Infinity, y: -1 },
+    { x: Infinity, y: size }
+  ])!
+
+  const numberOfExits = _.random(1, 3)
+  for (let i = 0; i < numberOfExits; i++) {
+    const template = directions.shift()!
+
+    const doorSize = _.sample([1, 2, 2, 2, 3, 3, 4])!
+    const start = _.random(0, size - 1 - doorSize)
+    for (let j = 0; j < doorSize; j++) {
+      let e = { x: template.x, y: template.y } // lol TS
+      if (e.x === Infinity) {
+        e.x = start + j
+      } else if (e.y === Infinity) {
+        e.y = start + j
+      }
+
+      exits.push(e)
+    }
+  }
+
   return {
     size,
-    exits: [],
+    exits,
     items,
     enemies: [],
     tiredEnemies: [],

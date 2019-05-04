@@ -44,7 +44,7 @@ class App extends React.Component<{}, State> {
         y: 2,
         items: []
       },
-      currentRoom: generateRoom({ x: -1, y: 4 })
+      currentRoom: generateRoom([{ x: -1, y: 4 }])
     }
 
     this.state = _.cloneDeep(this.initialState)
