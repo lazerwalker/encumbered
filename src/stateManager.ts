@@ -219,6 +219,13 @@ function resolveItemCollisions(state: State, oldState: State): State {
     stopMovement = true
   }
 
+  // Let's treat the enemy as a block
+  // That is, if the PLAYER (not their item) bumps into it, ignore
+  let enemy = _.find(state.currentRoom.enemies, e => e.x === player.x && e.y === player.y)
+  if (enemy) {
+    stopMovement = true
+  }
+
   player.items.forEach(heldItem => {
     // Pick up items
     let i = _.find(state.currentRoom.items, i => i.x === heldItem.x + player.x && i.y === heldItem.y + player.y)
