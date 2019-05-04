@@ -81,7 +81,7 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <div id='score-and-hp'>{score} | {this.state.hp}/{this.state.maxHP}</div>
+        <div id='score-and-hp'>${score} | {this.state.hp}/{this.state.maxHP}</div>
         <div id='grid' dangerouslySetInnerHTML={{ __html: print(grid) }} />
         <button id='drop'>Drop</button>
       </div>
