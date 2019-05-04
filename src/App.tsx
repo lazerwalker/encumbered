@@ -4,6 +4,7 @@ import GridCalculator, { TileType, GamePosition } from './GridCalculator';
 import { Player, Item } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
+import { Room, generateRoom } from './Room';
 
 const nipplejs = require('nipplejs')
 
@@ -14,13 +15,8 @@ function print(tiles: TileType[][]): string {
 }
 
 export interface State {
-  exits: GamePosition[]
+  currentRoom: Room
   player: Player
-  items: Item[]
-  size: number
-  enemies: GamePosition[]
-  tiredEnemies: GamePosition[]
-  walls: GamePosition[]
 
   hp: number
   maxHP: number
@@ -39,7 +35,6 @@ class App extends React.Component<{}, State> {
   constructor(props: any) {
     super(props)
     this.initialState = {
-      size: 8,
       exited: false,
       gameOver: false,
       hp: 3,
@@ -49,53 +44,7 @@ class App extends React.Component<{}, State> {
         y: 2,
         items: []
       },
-      enemies: [
-        { x: 7, y: 7 }
-      ],
-      tiredEnemies: [],
-      walls: [
-        { x: 0, y: 0 },
-        { x: 1, y: 0 }
-      ],
-      items: [
-        {
-          x: 4,
-          y: 4,
-          type: TileType.ItemNormal,
-          heldType: TileType.HeldItemNormal
-        },
-        {
-          x: 3,
-          y: 2,
-          type: TileType.ItemSword,
-          heldType: TileType.HeldItemSword
-        },
-        {
-          x: 6,
-          y: 2,
-          type: TileType.ItemMoney,
-          heldType: TileType.HeldItemMoney
-        },
-        {
-          x: 1,
-          y: 3,
-          type: TileType.ItemPush,
-          heldType: TileType.HeldItemPush
-        },
-        {
-          x: 5,
-          y: 5,
-          type: TileType.ItemBlock,
-          heldType: TileType.HeldItemBlock
-        }
-      ],
-      exits: [
-        { x: 4, y: -1 },
-        { x: 8, y: 7 },
-        { x: 8, y: 6 },
-        { x: -1, y: 2 },
-        { x: 4, y: 8 }
-      ]
+      currentRoom: generateRoom({ x: -1, y: 4 })
     }
 
     this.state = _.cloneDeep(this.initialState)

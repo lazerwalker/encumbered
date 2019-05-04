@@ -41,7 +41,8 @@ export interface GamePosition {
 
 // (0, 0) is bottom-left
 export default function (state: State): TileType[][] {
-  const { size, enemies, tiredEnemies, exits, walls, player } = state
+  const { size, enemies, tiredEnemies, exits, walls } = state.currentRoom
+  const player = state.player
 
   let result: TileType[][] = []
 
@@ -82,7 +83,7 @@ export default function (state: State): TileType[][] {
     safeSet(e.x, e.y, TileType.Door)
   })
 
-  state.items.forEach(i => {
+  state.currentRoom.items.forEach(i => {
     safeSet(i.x, i.y, i.type)
   })
 
@@ -106,12 +107,12 @@ export default function (state: State): TileType[][] {
 export function boundsCoordinates(state: State): GamePosition[] {
   let result: GamePosition[] = []
 
-  for (let i = -1; i <= state.size; i++) {
+  for (let i = -1; i <= state.currentRoom.size; i++) {
     result.push({ x: -1, y: i })
-    result.push({ x: state.size, y: i })
+    result.push({ x: state.currentRoom.size, y: i })
     result.push({ x: i, y: -1 })
-    result.push({ x: i, y: state.size })
+    result.push({ x: i, y: state.currentRoom.size })
   }
 
-  return _.differenceWith(result, state.exits, _.isEqual)
+  return _.differenceWith(result, state.currentRoom.exits, _.isEqual)
 }

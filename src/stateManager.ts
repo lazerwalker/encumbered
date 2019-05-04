@@ -31,7 +31,7 @@ export function wait(state: State): State {
 }
 
 export function release(state: State): State {
-  let newItems: Item[] = [...state.items]
+  let newItems: Item[] = [...state.currentRoom.items]
   let playerItems = state.player.items
 
   state.player.items.forEach(i => {
@@ -44,7 +44,7 @@ export function release(state: State): State {
     return {
       ...state,
       player: { ...state.player, items: playerItems },
-      items: newItems
+      currentRoom: { ...state.currentRoom, items: newItems }
     }
   } else {
     return state
@@ -78,7 +78,7 @@ function moveEnemies(state: State): State {
     TileType.HeldItemSword
   ]
 
-  for (const enemy of newState.enemies) {
+  for (const enemy of newState.currentRoom.enemies) {
     let graph: number[][] = [[]]
     let grid = GridCalculator(newState)
     for (let i = 0; i < grid.length - 2; i++) {
@@ -119,10 +119,10 @@ function moveEnemies(state: State): State {
 
       const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
       if (item) {
-        newState.enemies = _.without(newState.enemies, enemy)
+        newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
         enemy.x = oldPos.x
         enemy.y = oldPos.y
-        newState.tiredEnemies.push(enemy)
+        newState.currentRoom.tiredEnemies.push(enemy)
         newState.player.items = _.without(newState.player.items, item)
       }
     }
@@ -133,9 +133,9 @@ function moveEnemies(state: State): State {
     }
   }
 
-  for (const tiredEnemy of state.tiredEnemies) {
-    newState.tiredEnemies = _.without(newState.enemies, tiredEnemy)
-    newState.enemies.push(tiredEnemy)
+  for (const tiredEnemy of state.currentRoom.tiredEnemies) {
+    newState.currentRoom.tiredEnemies = _.without(newState.currentRoom.enemies, tiredEnemy)
+    newState.currentRoom.enemies.push(tiredEnemy)
   }
 
   console.log(newState)
@@ -149,7 +149,7 @@ function avoidsWallCollisions(state: State): boolean {
   playerCoordinates.push({ x: state.player.x, y: state.player.y })
 
   // If any player bit intersects with a wall, collide
-  if (_.intersectionWith(playerCoordinates, state.walls, _.isEqual).length > 0) {
+  if (_.intersectionWith(playerCoordinates, state.currentRoom.walls, _.isEqual).length > 0) {
     return false
   }
 
@@ -165,7 +165,7 @@ function avoidsWallCollisions(state: State): boolean {
     .map(i => ({ x: i.x + state.player.x, y: i.y + state.player.y }))
 
   for (let heldItem of blockTiles) {
-    let blocker = state.items.find(i => i.x === heldItem.x && i.y === heldItem.y)
+    let blocker = state.currentRoom.items.find(i => i.x === heldItem.x && i.y === heldItem.y)
     if (blocker) {
       return false
     }
@@ -176,7 +176,7 @@ function avoidsWallCollisions(state: State): boolean {
 
 function resolveItemCollisions(state: State, oldState: State): State {
   let player = state.player
-  let enemies = _.cloneDeep(state.enemies)
+  let enemies = _.cloneDeep(state.currentRoom.enemies)
   let destroyedItems: Item[] = []
   let pickedUpItems: Item[] = []
   let destroyedHeldItems: Item[] = []
@@ -184,7 +184,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
   let stopMovement = false
 
   // Player
-  let i = _.find(state.items, i => i.x === player.x && i.y === player.y)
+  let i = _.find(state.currentRoom.items, i => i.x === player.x && i.y === player.y)
   if (i) {
     destroyedItems.push(i)
     pickedUpItems.push(pickUpItem(oldState.player, i))
@@ -193,7 +193,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
 
   player.items.forEach(heldItem => {
     // Pick up items
-    let i = _.find(state.items, i => i.x === heldItem.x + player.x && i.y === heldItem.y + player.y)
+    let i = _.find(state.currentRoom.items, i => i.x === heldItem.x + player.x && i.y === heldItem.y + player.y)
     if (i) {
       stopMovement = true
       destroyedItems.push(i)
@@ -201,7 +201,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
     }
 
     // Kill enemy!
-    if (heldItem.type == TileType.ItemSword) {
+    if (heldItem.type === TileType.ItemSword) {
       let e = _.find(enemies, e => e.x === heldItem.x + player.x && e.y === heldItem.y + player.y)
       if (e) {
         destroyedHeldItems.push(heldItem)
@@ -217,11 +217,11 @@ function resolveItemCollisions(state: State, oldState: State): State {
     player.y = oldState.player.y
   }
 
-  const items = _.without(state.items, ...destroyedItems)
+  const items = _.without(state.currentRoom.items, ...destroyedItems)
   player.items.push(...pickedUpItems)
   player.items = _.without(player.items, ...destroyedHeldItems)
 
-  return { ...state, player, enemies, items }
+  return { ...state, player, currentRoom: { ...state.currentRoom, enemies, items } }
 }
 
 function hasExitedRoom(state: State): boolean {
