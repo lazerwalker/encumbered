@@ -1,8 +1,6 @@
 import { GamePosition, TileType } from "./GridCalculator";
 import { Player, Item } from "./Player";
 import _ from "lodash";
-import { number } from "prop-types";
-import { isOptionalMemberExpression } from "@babel/types";
 
 export interface Room {
   exits: GamePosition[]
@@ -34,7 +32,7 @@ export function generateRoom(entrance: GamePosition[]): Room {
   }
 
   let enemies: GamePosition[] = []
-  const numberOfEnemies = _.sample([0, 1, 1, 1, 2, 2, 2, 3, 3, 4])!
+  const numberOfEnemies = _.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
     enemies.push(pos)

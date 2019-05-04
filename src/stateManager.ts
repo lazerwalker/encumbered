@@ -68,13 +68,18 @@ function processPlayerChange(player: Player, oldState: State): State {
   return state
 }
 
+// TODO: This should be factored out into an enemy-specific file
 function moveEnemies(state: State): State {
   let newState = _.cloneDeep(state)
 
-  let wallTypes = [
-    TileType.Wall,
-    TileType.VerticalWall,
-    TileType.HorizontalWall,
+  let passableTypes = [
+    TileType.Floor,
+    TileType.Player,
+
+    TileType.HeldItemBlock,
+    TileType.HeldItemMoney,
+    TileType.HeldItemNormal,
+    TileType.HeldItemPush,
     TileType.HeldItemSword
   ]
 
@@ -84,10 +89,10 @@ function moveEnemies(state: State): State {
     for (let i = 0; i < grid.length - 2; i++) {
       graph.push([])
       for (let j = 0; j < grid[i].length - 2; j++) {
-        if (_.includes(wallTypes, grid[i + 1][j + 1])) {
-          graph[i][j] = 0
-        } else {
+        if (_.includes(passableTypes, grid[i + 1][j + 1])) {
           graph[i][j] = 1
+        } else {
+          graph[i][j] = 0
         }
       }
     }
@@ -112,6 +117,7 @@ function moveEnemies(state: State): State {
     if (result.length > 0) {
       const newPos = { x: result[0].y, y: result[0].x }
       const oldPos = { x: enemy.x, y: enemy.y }
+
       enemy.x = newPos.x
       enemy.y = newPos.y
       console.log(newPos)
@@ -119,11 +125,15 @@ function moveEnemies(state: State): State {
 
       const item = newState.player.items.find(i => newState.player.x + i.x === enemy.x && newState.player.y + i.y === enemy.y)
       if (item) {
-        newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
         enemy.x = oldPos.x
         enemy.y = oldPos.y
-        newState.currentRoom.tiredEnemies.push(enemy)
-        newState.player.items = _.without(newState.player.items, item)
+
+        if (item.type !== TileType.ItemSword) {
+          // If it's a sword, we'll just say they didn't move, rather than them consuming the item
+          newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
+          newState.currentRoom.tiredEnemies.push(enemy)
+          newState.player.items = _.without(newState.player.items, item)
+        }
       }
     }
 
