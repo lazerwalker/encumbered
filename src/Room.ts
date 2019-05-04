@@ -33,6 +33,14 @@ export function generateRoom(entrance: GamePosition[]): Room {
     items.push(randomItem(pos))
   }
 
+  let enemies: GamePosition[] = []
+  const numberOfEnemies = _.sample([0, 1, 1, 1, 2, 2, 2, 3, 3, 4])!
+  for (let i = 0; i < numberOfEnemies; i++) {
+    let pos = allCoordinates.shift()!
+    enemies.push(pos)
+  }
+
+
   let exits = [...entrance]
   const directions: GamePosition[] = _.shuffle([
     { x: -1, y: Infinity },
@@ -63,7 +71,7 @@ export function generateRoom(entrance: GamePosition[]): Room {
     size,
     exits,
     items,
-    enemies: [],
+    enemies,
     tiredEnemies: [],
     walls: []
   }
@@ -73,7 +81,7 @@ function randomItem(pos: GamePosition) {
   const types: [TileType, TileType][] = [
     [TileType.ItemSword, TileType.HeldItemSword],
     [TileType.ItemMoney, TileType.HeldItemMoney],
-    [TileType.ItemMoney, TileType.HeldItemNormal],
+    [TileType.ItemNormal, TileType.HeldItemNormal],
     [TileType.ItemPush, TileType.HeldItemPush],
     [TileType.ItemBlock, TileType.HeldItemBlock],
   ]
