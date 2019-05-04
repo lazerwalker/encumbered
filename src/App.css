@@ -7,7 +7,7 @@ body {
 #level-editor {
   position: absolute;
   left: 20px;
-  top: 0;
+  top: 0px;
   height: 100vh;
 }
 
@@ -55,32 +55,30 @@ body {
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
-}
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  #grid {
+    font-size: 50px;
+    line-height: 50px;
+    letter-spacing: 0px;
+    width: 400px;
   }
-  to {
-    transform: rotate(360deg);
+
+  #level-editor {
+    bottom: 200px;
+    height: 44px;
+    top: unset;
+  }
+
+  #level-editor div {
+    float: left;
+    font-size: 30px;
+    line-height: 44px;
+    height: 44px;
+    width: 44px
   }
 }

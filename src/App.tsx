@@ -17,7 +17,7 @@ const printGrid = (props: { tiles: TileType[][], size: number, onClick: (x: numb
         data-x={colIdx - 1}
         data-y={props.size - rowIdx}
         dangerouslySetInnerHTML={{ __html: tile }}
-        onClick={() => props.onClick(colIdx - 1, props.size - rowIdx)}
+        onTouchStart={() => props.onClick(colIdx - 1, props.size - rowIdx)}
       />
     })
     return <div>{mappedRow}</div>
@@ -107,7 +107,6 @@ class App extends React.Component<{}, State> {
       <div className="App">
         <div id='score-and-hp'>${score} | {this.state.hp}/{this.state.maxHP}</div>
         {grid}
-        <button id='drop'>Drop</button>
 
         <div id='level-editor'>
           {editorButtons}
