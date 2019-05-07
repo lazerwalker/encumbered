@@ -111,6 +111,8 @@ function moveEnemies(state: State): State {
     TileType.Floor,
     TileType.Player,
 
+    TileType.Door,
+
     TileType.HeldItemBlock,
     TileType.HeldItemMoney,
     TileType.HeldItemNormal,
@@ -136,10 +138,10 @@ function moveEnemies(state: State): State {
     // TODO: Here's where the frustrating math changes need to go to allow players to be in doorways
     let graph: number[][] = [[]]
     let grid = GridCalculator(newState)
-    for (let i = 0; i < grid.length - 2; i++) {
+    for (let i = 0; i < grid.length; i++) {
       graph.push([])
-      for (let j = 0; j < grid[i].length - 2; j++) {
-        if (_.includes(passableTypes, grid[i + 1][j + 1])) {
+      for (let j = 0; j < grid[i].length; j++) {
+        if (_.includes(passableTypes, grid[i][j])) {
           graph[i][j] = 1
         } else {
           graph[i][j] = 0
@@ -157,15 +159,15 @@ function moveEnemies(state: State): State {
     console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
     const result = astar.search(
       searchGraph,
-      searchGraph.grid[enemy.y][enemy.x],
-      searchGraph.grid[state.player.y][state.player.x],
+      searchGraph.grid[enemy.y + 1][enemy.x + 1],
+      searchGraph.grid[state.player.y + 1][state.player.x + 1],
       { heuristic: astar.heuristics.manhattan }
     );
 
     console.log(result.map((r: any) => `(${r.x}, ${r.y})`).join(" "))
 
     if (result.length > 0) {
-      const newPos = { x: result[0].y, y: result[0].x }
+      const newPos = { x: result[0].y - 1, y: result[0].x - 1 }
       const oldPos = { x: enemy.x, y: enemy.y }
 
       enemy.x = newPos.x
