@@ -1,6 +1,7 @@
 {
   "name": "encumbered",
   "version": "0.1.0",
+  "homepage": "https://lazerwalker.com/encumbered",
   "private": true,
   "dependencies": {
     "@types/jest": "24.0.11",
@@ -19,7 +20,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -38,6 +41,7 @@
   },
   "devDependencies": {
     "@types/javascript-astar": "^0.0.30",
-    "@types/lodash": "^4.14.123"
+    "@types/lodash": "^4.14.123",
+    "gh-pages": "^2.0.1"
   }
 }
