@@ -3,6 +3,7 @@ import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./Gri
 import { Item, Player } from "./Player";
 
 import _ from "lodash";
+import { generateRoom } from "./Room";
 const { astar, Graph } = require('javascript-astar')
 
 export type GameReducer = (state: State) => State
@@ -60,7 +61,41 @@ function processPlayerChange(player: Player, oldState: State): State {
   }
 
   if (hasExitedRoom(state)) {
-    state.exited = true
+    // state.exited = true
+
+    const playerPos = { ...oldState.player }
+    console.log("Exited! Generating!", playerPos)
+
+    const size = state.currentRoom.size
+
+    // Takes a coordinate on/past one edge of the map, and moves it to the oppoosite edge
+    const wrap = (pos: GamePosition): GamePosition => {
+      if (pos.x <= -1) {
+        return { x: size, y: pos.y }
+      } else if (pos.x >= size) {
+        return { x: -1, y: pos.y }
+      } else if (pos.y <= -1) {
+        return { x: pos.x, y: size }
+      } else if (pos.y >= size) {
+        return { x: pos.x, y: -1 }
+      } else {
+        return pos
+      }
+    }
+
+    const entrances = state.currentRoom.exits.filter(e => {
+      if (e.x <= -1 || e.x >= size) {
+        return (e.x === playerPos.x)
+      } else {
+        return (e.y === playerPos.y)
+      }
+    }).map(wrap)
+
+
+    state.currentRoom = generateRoom(entrances)
+    state.player = { ...state.player, ...wrap(playerPos) }
+    console.log(state)
+    return state
   }
 
   state = moveEnemies(state)
@@ -261,7 +296,15 @@ function resolveItemCollisions(state: State, oldState: State): State {
 
 function hasExitedRoom(state: State): boolean {
   const result = _.flatten(GridCalculator(state))
-  return !_.find(result, t => t === TileType.Player || t === TileType.PlayerItem)
+  const types = [
+    TileType.Player,
+    TileType.HeldItemNormal,
+    TileType.HeldItemMoney,
+    TileType.HeldItemSword,
+    TileType.HeldItemPush,
+    TileType.HeldItemBlock
+  ]
+  return !_.find(result, t => _.includes(types, t))
 }
 
 function pickUpItem(player: Player, item: Item): Item {
