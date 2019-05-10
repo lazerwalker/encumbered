@@ -68,7 +68,7 @@ function processPlayerChange(player: Player, oldState: State): State {
 
     const size = state.currentRoom.size
 
-    // Takes a coordinate on/past one edge of the map, and moves it to the oppoosite edge
+    // Takes a coordinate on one edge of the map, and moves it to the oppoosite edge
     const wrap = (pos: GamePosition): GamePosition => {
       if (pos.x <= -1) {
         return { x: size, y: pos.y }
@@ -83,16 +83,36 @@ function processPlayerChange(player: Player, oldState: State): State {
       }
     }
 
+    const clamp = (pos: GamePosition): GamePosition => {
+      if (pos.x <= -1) {
+        return { x: -1, y: pos.y }
+      } else if (pos.x >= size) {
+        return { x: size, y: pos.y }
+      } else if (pos.y <= -1) {
+        return { x: pos.x, y: -1 }
+      } else if (pos.y >= size) {
+        return { x: pos.x, y: size }
+      } else {
+        return pos
+      }
+    }
+
+    const clampedPlayer = clamp(playerPos)
+
     const entrances = state.currentRoom.exits.filter(e => {
       if (e.x <= -1 || e.x >= size) {
-        return (e.x === playerPos.x)
+        return (e.x === clampedPlayer.x)
       } else {
-        return (e.y === playerPos.y)
+        return (e.y === clampedPlayer.y)
       }
-    }).map(wrap)
+    }).map(clamp).map(wrap)
+
+    if (entrances.length === 0) {
+      console.log("WHY NO ENTRANCES", state.currentRoom.exits)
+    }
 
 
-    state.currentRoom = generateRoom(entrances)
+    state.currentRoom = generateRoom({ x: 0, y: 0 }, entrances, [])
     state.player = { ...state.player, ...wrap(playerPos) }
     console.log(state)
     return state
