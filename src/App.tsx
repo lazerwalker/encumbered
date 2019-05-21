@@ -19,6 +19,7 @@ const printGrid = (props: { tiles: TileType[][], size: number, onClick: (x: numb
         data-y={props.size - rowIdx}
         dangerouslySetInnerHTML={{ __html: tile }}
         onTouchStart={() => props.onClick(colIdx - 1, props.size - rowIdx)}
+        onClick={() => props.onClick(colIdx - 1, props.size - rowIdx)}
       />
     })
     return <div>{mappedRow}</div>
@@ -75,20 +76,27 @@ class App extends React.Component<{}, State> {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown)
 
-    window.addEventListener('touchstart', this.handleTouchStart)
-    window.addEventListener('touchmove', this.handleTouchMove)
-    window.addEventListener('touchend', this.handleTouchEnd)
+    // This touch detector stolen from Modernizr
+    // Detecting touch this way is normally a bad idea!
+    // in our case, I don't want to allow joystick movement on non-touch.
+    const isTouch = (('ontouchstart' in window) || (window as any).TouchEvent || (window as any).DocumentTouch && document instanceof (window as any).DocumentTouch)
 
-    var manager = nipplejs.create({
-      color: "#000",
-      dataOnly: true,
-      fadeTime: 0,
-    });
+    if (isTouch) {
+      window.addEventListener('touchstart', this.handleTouchStart)
+      window.addEventListener('touchmove', this.handleTouchMove)
+      window.addEventListener('touchend', this.handleTouchEnd)
 
-    manager.on('added', (evt: any, nipple: any) => {
-      nipple.on('dir', this.handleJoystickMove)
-      nipple.on('end', this.handleJoystickEnd)
-    })
+      var manager = nipplejs.create({
+        color: "#000",
+        dataOnly: true,
+        fadeTime: 0,
+      });
+
+      manager.on('added', (evt: any, nipple: any) => {
+        nipple.on('dir', this.handleJoystickMove)
+        nipple.on('end', this.handleJoystickEnd)
+      })
+    }
   }
 
   componentWillUnmount() {

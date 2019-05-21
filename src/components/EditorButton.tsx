@@ -16,6 +16,7 @@ class EditorButton extends React.Component<Props> {
         key={this.props.type}
         dangerouslySetInnerHTML={{ __html: this.props.type }}
         onTouchStart={this.handleClick}
+        onClick={this.handleClick}
       />
     )
   }
