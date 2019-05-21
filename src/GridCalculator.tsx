@@ -103,6 +103,91 @@ export default function (state: State): TileType[][] {
   return result
 }
 
+export interface RenderObject {
+  tile: TileType
+  x: number
+  y: number
+  key: string
+}
+
+/** Tech debt warning!
+ * We originally rendered a grid (TileType[][]). To allow for animations, we now instead render specific objects
+ * but currently maintain the old grid-calculation logic as a means of knowing which objects are visible
+ * This should definitely be refactored.
+ */
+
+// (0, 0) is bottom-left
+export function PrintGridCalculator(state: State): RenderObject[] {
+  const { size, enemies, tiredEnemies, exits, walls } = state.currentRoom
+  const player = state.player
+
+  let result: { [pos: string]: RenderObject } = {}
+
+  function safeSet(x: number, y: number, type: TileType, key: string) {
+    if (x < -1
+      || x > size
+      || y < -1
+      || y > size) { return }
+
+    result[`${size - y},${x + 1}`] = {
+      key,
+      tile: type,
+      y: size - y,
+      x: x + 1
+    }
+  }
+
+  for (let i = 0; i <= size + 1; i++) {
+    for (let j = 0; j <= size + 1; j++) {
+      safeSet(j, i, TileType.Floor, `floor-${i},${j}`)
+    }
+  }
+
+  for (let i = -1; i <= size; i++) {
+    safeSet(i, -1, TileType.HorizontalWall, `leftWall-${i}`)
+    safeSet(i, size, TileType.HorizontalWall, `rightWall-${i}`)
+
+    safeSet(-1, i, TileType.VerticalWall, `bottomWall-${i}`)
+    safeSet(size, i, TileType.VerticalWall, `topWall-${i}`)
+  }
+
+  safeSet(-1, -1, TileType.BottomLeftCorner, 'bottomLeft')
+  safeSet(size, -1, TileType.BottomRightCorner, 'bottomRight')
+  safeSet(-1, size, TileType.TopLeftCorner, 'topLeft')
+  safeSet(size, size, TileType.TopRightCorner, 'topRight')
+
+  walls.forEach((w, idx) => {
+    safeSet(w.x, w.y, TileType.Wall, w.key)
+  })
+
+  exits.forEach((e, idx) => {
+    safeSet(e.x, e.y, TileType.Door, e.key)
+  })
+
+  state.currentRoom.items.forEach((i, idx) => {
+    safeSet(i.x, i.y, i.type, i.key)
+  })
+
+  state.player.items.forEach((i, idx) => {
+    safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType, i.key)
+  })
+
+  safeSet(player.x, player.y, TileType.Player, player.key)
+
+  tiredEnemies.forEach((e, idx) => {
+    safeSet(e.x, e.y, TileType.EnemyTired, e.key)
+  })
+
+  enemies.forEach((e, idx) => {
+    safeSet(e.x, e.y, TileType.Enemy, e.key)
+  })
+
+  // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys
+
+  return Object.values(result)
+}
+
+
 // Coords of all room wall tiles, without the corridors
 export function boundsCoordinates(state: State): GamePosition[] {
   let result: GamePosition[] = []

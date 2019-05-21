@@ -1,31 +1,47 @@
 import React from 'react';
 import './App.css';
-import GridCalculator, { TileType } from './GridCalculator';
+import GridCalculator, { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
 import { Player } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
 import { Room, generateRoom } from './Room';
 import EditorButton from './components/EditorButton'
 import { Dungeon, generateDungeon, dungeonRoomAt } from './Dungeon';
+import uuid from './uuid';
 
 const nipplejs = require('nipplejs')
 
 // TODO: Looool, this should be properly React Component-ified
-const printGrid = (props: { tiles: TileType[][], size: number, onClick: (x: number, y: number) => void }) => {
-  const grid = props.tiles.map((row, rowIdx) => {
-    const mappedRow = row.map((tile, colIdx) => {
-      return <span
-        data-x={colIdx - 1}
-        data-y={props.size - rowIdx}
-        dangerouslySetInnerHTML={{ __html: tile }}
-        onTouchStart={() => props.onClick(colIdx - 1, props.size - rowIdx)}
-        onClick={() => props.onClick(colIdx - 1, props.size - rowIdx)}
-      />
-    })
-    return <div>{mappedRow}</div>
+const printGrid = (props: { tiles: RenderObject[], size: number, onClick: (x: number, y: number) => void }) => {
+  let grid = []
+  for (let i = 0; i < props.size + 2; i++) {
+    let row = []
+    for (let j = 0; j < props.size + 2; j++) {
+      row.push(<span
+        className="bg"
+        key={`empty-${i},${j}`}
+        data-x={j - 1}
+        data-y={props.size - i}
+        onTouchStart={() => props.onClick(j - 1, props.size - i)}
+        onClick={() => props.onClick(j - 1, props.size - i)}
+      >&nbsp;</span>)
+    }
+    grid.push(<div key={`row-${i}`}>{row}</div>)
+  }
+
+  // TODO: Moving up doesn't animate, while left/right/down do!?
+  const objects = props.tiles.map(obj => {
+    return <span
+      className="symbol"
+      dangerouslySetInnerHTML={{ __html: obj.tile }}
+      key={obj.key}
+      style={{
+        top: `${5 + obj.y * 60}px`,
+        left: `${5 + obj.x * 50}px`
+      }} />
   })
 
-  return <div id='grid'>{grid}</div>
+  return <div id='grid'>{grid}{objects}</div>
 }
 
 export interface State {
@@ -63,6 +79,7 @@ class App extends React.Component<{}, State> {
       player: {
         x: 2,
         y: 2,
+        key: "player",
         items: []
       },
       dungeon,
@@ -104,7 +121,7 @@ class App extends React.Component<{}, State> {
   }
 
   render() {
-    const grid = printGrid({ tiles: GridCalculator(this.state), size: this.state.currentRoom.size, onClick: this.handleEditorBoardClick })
+    const grid = printGrid({ tiles: PrintGridCalculator(this.state), size: this.state.currentRoom.size, onClick: this.handleEditorBoardClick })
 
     const score = this.state.player.items.filter(i => i.type === TileType.ItemMoney).length
 
@@ -242,19 +259,19 @@ class App extends React.Component<{}, State> {
         player: { ...this.state.player, x, y }
       })
     } else if (type === TileType.Enemy) {
-      const enemies = [...this.state.currentRoom.enemies, { x, y, type }]
+      const enemies = [...this.state.currentRoom.enemies, { x, y, type, key: uuid() }]
       this.setState({
         selectedEditorButton: undefined,
         currentRoom: { ...this.state.currentRoom, enemies }
       })
     } else if (type === TileType.Door) {
-      const exits = [...this.state.currentRoom.exits, { x, y }]
+      const exits = [...this.state.currentRoom.exits, { x, y, key: uuid() }]
       this.setState({
         selectedEditorButton: undefined,
         currentRoom: { ...this.state.currentRoom, exits }
       })
     } else if (type === TileType.Wall) {
-      const walls = [...this.state.currentRoom.walls, { x, y }]
+      const walls = [...this.state.currentRoom.walls, { x, y, key: uuid() }]
       this.setState({
         selectedEditorButton: undefined,
         currentRoom: { ...this.state.currentRoom, walls }
@@ -269,7 +286,7 @@ class App extends React.Component<{}, State> {
         return type
       }
 
-      const item = { x, y, type, heldType: heldType(type) }
+      const item = { x, y, type, heldType: heldType(type), key: uuid() }
       const items = [...this.state.currentRoom.items, item]
       this.setState({
         selectedEditorButton: undefined,

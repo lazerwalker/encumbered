@@ -1,4 +1,4 @@
-import { Room, generateRoom, Direction, sideFromExit, wrap } from "./Room";
+import { Room, generateRoom, Direction, sideFromExit, wrap, KeyedPosition, keyedWrap } from "./Room";
 import { GamePosition } from "./GridCalculator";
 
 function roomKey(pos: GamePosition): string {
@@ -20,7 +20,7 @@ export function generateDungeon(): Dungeon {
   }
 
   const tryToGenerateRoom = (pos: GamePosition): Room => {
-    let entrances: GamePosition[] = []
+    let entrances: KeyedPosition[] = []
 
     const check: [GamePosition, Direction][] =
       [
@@ -35,7 +35,7 @@ export function generateDungeon(): Dungeon {
       if (room) {
         const es = room.exits.filter(e => {
           return sideFromExit(e, 8) === direction
-        }).map(wrap)
+        }).map(keyedWrap)
         entrances.push(...es)
       }
     })

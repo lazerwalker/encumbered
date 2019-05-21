@@ -1,14 +1,21 @@
 import { GamePosition, TileType } from "./GridCalculator";
 import { Item } from "./Player";
 import _ from "lodash";
+import uuid from "./uuid";
+
+export interface KeyedPosition {
+  x: number
+  y: number
+  key: string
+}
 
 export interface Room {
-  exits: GamePosition[]
+  exits: KeyedPosition[]
   items: Item[]
   size: number
-  enemies: GamePosition[]
-  tiredEnemies: GamePosition[]
-  walls: GamePosition[]
+  enemies: KeyedPosition[]
+  tiredEnemies: KeyedPosition[]
+  walls: KeyedPosition[]
 
   pos: GamePosition
 }
@@ -36,6 +43,10 @@ export function wrap(pos: GamePosition): GamePosition {
   }
 }
 
+export function keyedWrap(pos: KeyedPosition): KeyedPosition {
+  return { ...wrap(pos), key: pos.key }
+}
+
 export function clamp(pos: GamePosition, size: number = 8): GamePosition {
   if (pos.x <= -1) {
     return { x: -1, y: pos.y }
@@ -48,6 +59,10 @@ export function clamp(pos: GamePosition, size: number = 8): GamePosition {
   } else {
     return pos
   }
+}
+
+export function keyedClamp(pos: KeyedPosition): KeyedPosition {
+  return { ...clamp(pos), key: pos.key }
 }
 
 export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
@@ -65,7 +80,7 @@ export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
   return Direction.Left
 }
 
-export function generateRoom(coord: GamePosition, entrance?: GamePosition[], forbiddenSides: Direction[] = []): Room {
+export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], forbiddenSides: Direction[] = []): Room {
   const size = 8
 
   console.log("GENERATEROOM!", coord, entrance, forbiddenSides)
@@ -87,14 +102,14 @@ export function generateRoom(coord: GamePosition, entrance?: GamePosition[], for
     items.push(randomItem(pos))
   }
 
-  let enemies: GamePosition[] = []
+  let enemies: KeyedPosition[] = []
   const numberOfEnemies = 0 //_.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
-    enemies.push(pos)
+    enemies.push({ ...pos, key: uuid() })
   }
 
-  let exits: GamePosition[] = []
+  let exits: KeyedPosition[] = []
   if (entrance && entrance.length > 0) {
     exits = [...entrance]
     forbiddenSides.push(sideFromExit(entrance[0], size))
@@ -135,7 +150,7 @@ export function generateRoom(coord: GamePosition, entrance?: GamePosition[], for
         e.y = start + j
       }
 
-      exits.push(e)
+      exits.push({ ...e, key: uuid() })
     }
   }
 
@@ -163,7 +178,8 @@ export function generateRoom(coord: GamePosition, entrance?: GamePosition[], for
     return {
       ...pos,
       type: type[0],
-      heldType: type[1]
+      heldType: type[1],
+      key: uuid()
     }
   }
 }

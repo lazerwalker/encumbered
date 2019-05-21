@@ -4,12 +4,15 @@ export interface Player {
   x: number
   y: number
 
+  key: "player"
   items: Item[]
 }
 
 export interface Item {
   type: TileType
   heldType: TileType
+
+  key: string
 
   // By convention, (0, 0) is the bottom left of the item
   // If in the world, a map position
