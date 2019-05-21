@@ -1,34 +1,25 @@
-import { Room, generateRoom, Direction, sideFromExit } from "./Room";
+import { Room, generateRoom, Direction, sideFromExit, wrap } from "./Room";
 import { GamePosition } from "./GridCalculator";
 
 function roomKey(pos: GamePosition): string {
-
   return `${pos.x},${pos.y}`
 }
+
 /* For now, a dungeon is just a 3x3 grid, where every room connects to each other */
-class Dungeon {
+export interface Dungeon {
   // `coord` is of the form "x,y". e.g. "1,2"
   // As with within rooms, positions are zero-indexed, and with (0, 0) in the bottom-left 
   rooms: { [coord: string]: Room }
+}
 
-  constructor() {
-    this.rooms = {}
+export function generateDungeon(): Dungeon {
+  const rooms: { [coord: string]: Room } = {}
 
-    const first = generateRoom({ x: 0, y: 0 })
-    this.rooms[roomKey({ x: 0, y: 0 })] = first
-
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-
-      }
-    }
+  const roomAt = (pos: GamePosition) => {
+    return rooms[roomKey(pos)]
   }
 
-  roomAt(pos: GamePosition) {
-    return this.rooms[roomKey(pos)]
-  }
-
-  tryToGenerateRoom(pos: GamePosition): Room {
+  const tryToGenerateRoom = (pos: GamePosition): Room => {
     let entrances: GamePosition[] = []
 
     const check: [GamePosition, Direction][] =
@@ -40,11 +31,12 @@ class Dungeon {
       ]
 
     check.forEach(([pos, direction]) => {
-      const room = this.roomAt(pos)
+      const room = roomAt(pos)
       if (room) {
-        entrances.push(...room.exits.filter(e => {
-          return sideFromExit(e, 8) == direction
-        }))
+        const es = room.exits.filter(e => {
+          return sideFromExit(e, 8) === direction
+        }).map(wrap)
+        entrances.push(...es)
       }
     })
 
@@ -69,8 +61,37 @@ class Dungeon {
     return generateRoom(pos, entrances, forbidden)
   }
 
-  roomByTakingExit(room: Room, exit: GamePosition[]): Room {
-    return this.rooms["foo"]
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const room = tryToGenerateRoom({ x: i, y: j })
+      if (room) {
+        rooms[roomKey(room.pos)] = room
+      }
+    }
   }
+
+  return { rooms }
 }
 
+export function roomByTakingExit(dungeon: Dungeon, room: Room, exit: GamePosition): Room {
+  const direction = sideFromExit(exit)
+  console.log("DIRECTION", direction)
+  let newPos = room.pos
+  if (direction === Direction.Left) {
+    newPos.x -= 1
+  } else if (direction === Direction.Right) {
+    newPos.x += 1
+  } else if (direction === Direction.Up) {
+    newPos.y += 1
+  } else if (direction === Direction.Down) {
+    newPos.y -= 1
+  }
+
+  console.log("Returning room at", newPos)
+  return dungeonRoomAt(dungeon, newPos)
+}
+
+export function dungeonRoomAt(dungeon: Dungeon, pos: GamePosition): Room {
+  console.log(pos, roomKey(pos), dungeon.rooms[roomKey(pos)].pos, dungeon)
+  return dungeon.rooms[roomKey(pos)]
+}

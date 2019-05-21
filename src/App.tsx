@@ -1,11 +1,12 @@
 import React from 'react';
 import './App.css';
 import GridCalculator, { TileType } from './GridCalculator';
-import { Player, Item } from './Player';
+import { Player } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
 import { Room, generateRoom } from './Room';
 import EditorButton from './components/EditorButton'
+import { Dungeon, generateDungeon, dungeonRoomAt } from './Dungeon';
 
 const nipplejs = require('nipplejs')
 
@@ -27,7 +28,6 @@ const printGrid = (props: { tiles: TileType[][], size: number, onClick: (x: numb
 }
 
 export interface State {
-  currentRoom: Room
   player: Player
 
   hp: number
@@ -35,6 +35,9 @@ export interface State {
 
   exited: boolean
   gameOver: boolean
+
+  dungeon: Dungeon
+  currentRoom: Room
 
   selectedEditorButton?: TileType
 }
@@ -48,6 +51,9 @@ class App extends React.Component<{}, State> {
 
   constructor(props: any) {
     super(props)
+
+    const dungeon = generateDungeon()
+
     this.initialState = {
       exited: false,
       gameOver: false,
@@ -58,9 +64,11 @@ class App extends React.Component<{}, State> {
         y: 2,
         items: []
       },
-      currentRoom: generateRoom({ x: 0, y: 0 }, [{ x: -1, y: 4 }])
+      dungeon,
+      currentRoom: dungeonRoomAt(dungeon, { x: 1, y: 1 })
     }
 
+    console.log(dungeon.rooms)
     this.state = _.cloneDeep(this.initialState)
   }
 

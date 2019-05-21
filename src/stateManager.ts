@@ -3,7 +3,8 @@ import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./Gri
 import { Item, Player } from "./Player";
 
 import _ from "lodash";
-import { generateRoom } from "./Room";
+import { generateRoom, clamp, wrap } from "./Room";
+import { roomByTakingExit } from "./Dungeon";
 const { astar, Graph } = require('javascript-astar')
 
 export type GameReducer = (state: State) => State
@@ -64,56 +65,28 @@ function processPlayerChange(player: Player, oldState: State): State {
     // state.exited = true
 
     const playerPos = { ...oldState.player }
-    console.log("Exited! Generating!", playerPos)
 
     const size = state.currentRoom.size
 
-    // Takes a coordinate on one edge of the map, and moves it to the oppoosite edge
-    const wrap = (pos: GamePosition): GamePosition => {
-      if (pos.x <= -1) {
-        return { x: size, y: pos.y }
-      } else if (pos.x >= size) {
-        return { x: -1, y: pos.y }
-      } else if (pos.y <= -1) {
-        return { x: pos.x, y: size }
-      } else if (pos.y >= size) {
-        return { x: pos.x, y: -1 }
-      } else {
-        return pos
-      }
-    }
-
-    const clamp = (pos: GamePosition): GamePosition => {
-      if (pos.x <= -1) {
-        return { x: -1, y: pos.y }
-      } else if (pos.x >= size) {
-        return { x: size, y: pos.y }
-      } else if (pos.y <= -1) {
-        return { x: pos.x, y: -1 }
-      } else if (pos.y >= size) {
-        return { x: pos.x, y: size }
-      } else {
-        return pos
-      }
-    }
-
     const clampedPlayer = clamp(playerPos)
 
-    const entrances = state.currentRoom.exits.filter(e => {
+    const exits = state.currentRoom.exits.filter(e => {
       if (e.x <= -1 || e.x >= size) {
         return (e.x === clampedPlayer.x)
       } else {
         return (e.y === clampedPlayer.y)
       }
-    }).map(clamp).map(wrap)
+    }).map(clamp)
+
+    const entrances = exits.map(wrap)
 
     if (entrances.length === 0) {
       console.log("WHY NO ENTRANCES", state.currentRoom.exits)
     }
 
-
-    state.currentRoom = generateRoom({ x: 0, y: 0 }, entrances, [])
+    state.currentRoom = roomByTakingExit(state.dungeon, state.currentRoom, exits[0])
     state.player = { ...state.player, ...wrap(playerPos) }
+    console.log("New Room", state.currentRoom.pos)
     console.log(state)
     return state
   }

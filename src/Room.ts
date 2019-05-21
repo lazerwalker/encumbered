@@ -1,5 +1,5 @@
 import { GamePosition, TileType } from "./GridCalculator";
-import { Player, Item } from "./Player";
+import { Item } from "./Player";
 import _ from "lodash";
 
 export interface Room {
@@ -20,6 +20,36 @@ export enum Direction {
   Right = "right",
 }
 
+export function wrap(pos: GamePosition): GamePosition {
+  const size = 8 // TODO
+
+  if (pos.x <= -1) {
+    return { x: size, y: pos.y }
+  } else if (pos.x >= size) {
+    return { x: -1, y: pos.y }
+  } else if (pos.y <= -1) {
+    return { x: pos.x, y: size }
+  } else if (pos.y >= size) {
+    return { x: pos.x, y: -1 }
+  } else {
+    return pos
+  }
+}
+
+export function clamp(pos: GamePosition, size: number = 8): GamePosition {
+  if (pos.x <= -1) {
+    return { x: -1, y: pos.y }
+  } else if (pos.x >= size) {
+    return { x: size, y: pos.y }
+  } else if (pos.y <= -1) {
+    return { x: pos.x, y: -1 }
+  } else if (pos.y >= size) {
+    return { x: pos.x, y: size }
+  } else {
+    return pos
+  }
+}
+
 export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
   if (exit.x <= -1) {
     return Direction.Left
@@ -37,6 +67,8 @@ export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
 
 export function generateRoom(coord: GamePosition, entrance?: GamePosition[], forbiddenSides: Direction[] = []): Room {
   const size = 8
+
+  console.log("GENERATEROOM!", coord, entrance, forbiddenSides)
 
   let allCoordinates: GamePosition[] = []
   for (let i = 0; i < size; i++) {
@@ -56,14 +88,14 @@ export function generateRoom(coord: GamePosition, entrance?: GamePosition[], for
   }
 
   let enemies: GamePosition[] = []
-  const numberOfEnemies = _.filter(items, i => i.type === TileType.ItemSword).length
+  const numberOfEnemies = 0 //_.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
     enemies.push(pos)
   }
 
   let exits: GamePosition[] = []
-  if (entrance) {
+  if (entrance && entrance.length > 0) {
     exits = [...entrance]
     forbiddenSides.push(sideFromExit(entrance[0], size))
     console.log("Adding entrance: ", entrance)
@@ -89,7 +121,7 @@ export function generateRoom(coord: GamePosition, entrance?: GamePosition[], for
 
   directions = _.shuffle(directions)
 
-  const numberOfExits = _.random(1, 3)
+  const numberOfExits = Math.min(_.random(1, 3), directions.length)
   for (let i = 0; i < numberOfExits; i++) {
     const template = directions.shift()!
 
