@@ -27,7 +27,7 @@ export enum Direction {
   Right = "right",
 }
 
-export function wrap(pos: GamePosition): GamePosition {
+function wrap(pos: GamePosition): GamePosition {
   const size = 8 // TODO
 
   if (pos.x <= -1) {
@@ -47,7 +47,7 @@ export function keyedWrap(pos: KeyedPosition): KeyedPosition {
   return { ...wrap(pos), key: pos.key }
 }
 
-export function clamp(pos: GamePosition, size: number = 8): GamePosition {
+function clamp(pos: GamePosition, size: number = 8): GamePosition {
   if (pos.x <= -1) {
     return { x: -1, y: pos.y }
   } else if (pos.x >= size) {

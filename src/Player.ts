@@ -4,7 +4,7 @@ export interface Player {
   x: number
   y: number
 
-  key: "player"
+  key: string
   items: Item[]
 }
 

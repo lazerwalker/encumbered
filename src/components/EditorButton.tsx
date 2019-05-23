@@ -13,7 +13,7 @@ class EditorButton extends React.Component<Props> {
       <div
         className={this.props.selected ? "selected" : ""}
         data-tiletype={this.props.type}
-        key={this.props.type}
+        key={`editorButton-${this.props.type}`}
         dangerouslySetInnerHTML={{ __html: this.props.type }}
         onTouchStart={this.handleClick}
         onClick={this.handleClick}

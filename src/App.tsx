@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import GridCalculator, { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
+import { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
 import { Player } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
@@ -8,6 +8,7 @@ import { Room, generateRoom } from './Room';
 import EditorButton from './components/EditorButton'
 import { Dungeon, generateDungeon, dungeonRoomAt } from './Dungeon';
 import uuid from './uuid';
+import GridSymbol from './components/GridSymbol'
 
 const nipplejs = require('nipplejs')
 
@@ -29,17 +30,16 @@ const printGrid = (props: { tiles: RenderObject[], size: number, onClick: (x: nu
     grid.push(<div key={`row-${i}`}>{row}</div>)
   }
 
-  // TODO: Moving up doesn't animate, while left/right/down do!?
-  const objects = props.tiles.map(obj => {
-    return <span
-      className="symbol"
-      dangerouslySetInnerHTML={{ __html: obj.tile }}
-      key={obj.key}
-      style={{
-        top: `${5 + obj.y * 60}px`,
-        left: `${5 + obj.x * 50}px`
-      }} />
-  })
+  // TODO: We need to sort this in order for animations to work.
+  // That's a small our key logic isn't working properly.
+  const objects = _.sortBy(props.tiles, t => t.key)
+    .map(obj => {
+      if (obj.tile === TileType.Player) {
+        console.log(obj)
+      }
+
+      return <GridSymbol obj={obj} />
+    })
 
   return <div id='grid'>{grid}{objects}</div>
 }

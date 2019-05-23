@@ -1,4 +1,4 @@
-import { Room, generateRoom, Direction, sideFromExit, wrap, KeyedPosition, keyedWrap } from "./Room";
+import { Room, generateRoom, Direction, sideFromExit, KeyedPosition, keyedWrap } from "./Room";
 import { GamePosition } from "./GridCalculator";
 
 function roomKey(pos: GamePosition): string {

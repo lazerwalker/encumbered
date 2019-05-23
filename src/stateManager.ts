@@ -3,7 +3,7 @@ import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./Gri
 import { Item, Player } from "./Player";
 
 import _ from "lodash";
-import { generateRoom, clamp, wrap } from "./Room";
+import { keyedWrap, keyedClamp } from "./Room";
 import { roomByTakingExit } from "./Dungeon";
 const { astar, Graph } = require('javascript-astar')
 
@@ -68,7 +68,7 @@ function processPlayerChange(player: Player, oldState: State): State {
 
     const size = state.currentRoom.size
 
-    const clampedPlayer = clamp(playerPos)
+    const clampedPlayer = keyedClamp(playerPos)
 
     const exits = state.currentRoom.exits.filter(e => {
       if (e.x <= -1 || e.x >= size) {
@@ -76,16 +76,16 @@ function processPlayerChange(player: Player, oldState: State): State {
       } else {
         return (e.y === clampedPlayer.y)
       }
-    }).map(clamp)
+    }).map(keyedClamp)
 
-    const entrances = exits.map(wrap)
+    const entrances = exits.map(keyedWrap)
 
     if (entrances.length === 0) {
       console.log("WHY NO ENTRANCES", state.currentRoom.exits)
     }
 
     state.currentRoom = roomByTakingExit(state.dungeon, state.currentRoom, exits[0])
-    state.player = { ...state.player, ...wrap(playerPos) }
+    state.player = { ...state.player, ...keyedWrap(playerPos) }
     console.log("New Room", state.currentRoom.pos)
     console.log(state)
     return state

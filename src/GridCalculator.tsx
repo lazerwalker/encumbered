@@ -184,7 +184,7 @@ export function PrintGridCalculator(state: State): RenderObject[] {
 
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys
 
-  return Object.values(result)
+  return Object.values(result).filter(o => o.tile !== TileType.Floor)
 }
 
 
