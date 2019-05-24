@@ -165,7 +165,6 @@ class App extends React.Component<{}, State> {
       clearTimeout(this.joystickTimerId)
     }
 
-    console.log(e.target.direction.angle)
     let keyMap: { [dir: string]: GameReducer } = {
       "up": moveUp,
       "down": moveDown,

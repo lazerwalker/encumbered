@@ -57,7 +57,6 @@ function processPlayerChange(player: Player, oldState: State): State {
   let state = resolveItemCollisions({ ...oldState, player }, oldState)
 
   if (!avoidsWallCollisions(state)) {
-    console.log("Wall?")
     return oldState
   }
 
@@ -87,7 +86,6 @@ function processPlayerChange(player: Player, oldState: State): State {
     state.currentRoom = roomByTakingExit(state.dungeon, state.currentRoom, exits[0])
     state.player = { ...state.player, ...keyedWrap(playerPos) }
     console.log("New Room", state.currentRoom.pos)
-    console.log(state)
     return state
   }
 
@@ -145,11 +143,11 @@ function moveEnemies(state: State): State {
     graph.shift()
 
 
-    console.log("%cPathfinding Grid", "font-weight: bold")
-    console.log(`%c${graph.map((g, i) => `${i}: ${g.join("")}`).join("\n")}`, "font-family: monospace")
+    // console.log("%cPathfinding Grid", "font-weight: bold")
+    // console.log(`%c${graph.map((g, i) => `${i}: ${g.join("")}`).join("\n")}`, "font-family: monospace")
     let searchGraph = new Graph(graph)
 
-    console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
+    // console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
     const result = astar.search(
       searchGraph,
       searchGraph.grid[enemy.y + 1][enemy.x + 1],
@@ -157,7 +155,7 @@ function moveEnemies(state: State): State {
       { heuristic: astar.heuristics.manhattan }
     );
 
-    console.log(result.map((r: any) => `(${r.x}, ${r.y})`).join(" "))
+    // console.log(result.map((r: any) => `(${r.x}, ${r.y})`).join(" "))
 
     if (result.length > 0) {
       const newPos = { x: result[0].y - 1, y: result[0].x - 1 }
@@ -165,7 +163,7 @@ function moveEnemies(state: State): State {
 
       enemy.x = newPos.x
       enemy.y = newPos.y
-      console.log(newPos)
+      // console.log(newPos)
 
       if (state.player.x === enemy.x && state.player.y === enemy.y) {
         newState.hp -= 1
@@ -196,7 +194,7 @@ function moveEnemies(state: State): State {
     newState.currentRoom.enemies.push(tiredEnemy)
   }
 
-  console.log(newState)
+  // console.log(newState)
   return newState
 }
 

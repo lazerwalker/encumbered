@@ -92,6 +92,7 @@ export function roomByTakingExit(dungeon: Dungeon, room: Room, exit: GamePositio
 }
 
 export function dungeonRoomAt(dungeon: Dungeon, pos: GamePosition): Room {
+  console.log(dungeon.rooms)
   console.log(pos, roomKey(pos), dungeon.rooms[roomKey(pos)].pos, dungeon)
   return dungeon.rooms[roomKey(pos)]
 }
