@@ -76,7 +76,7 @@ export function generateDungeon(): Dungeon {
 export function roomByTakingExit(dungeon: Dungeon, room: Room, exit: GamePosition): Room {
   const direction = sideFromExit(exit)
   console.log("DIRECTION", direction)
-  let newPos = room.pos
+  let newPos = { ...room.pos }
   if (direction === Direction.Left) {
     newPos.x -= 1
   } else if (direction === Direction.Right) {
