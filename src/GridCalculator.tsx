@@ -199,5 +199,6 @@ export function boundsCoordinates(state: State): GamePosition[] {
     result.push({ x: i, y: state.currentRoom.size })
   }
 
-  return _.differenceWith(result, state.currentRoom.exits, _.isEqual)
+  const unkeyedExits = state.currentRoom.exits.map((e) => { return { x: e.x, y: e.y } })
+  return _.differenceWith(result, unkeyedExits, _.isEqual)
 }

@@ -34,11 +34,7 @@ const printGrid = (props: { tiles: RenderObject[], size: number, onClick: (x: nu
   // That's a small our key logic isn't working properly.
   const objects = _.sortBy(props.tiles, t => t.key)
     .map(obj => {
-      if (obj.tile === TileType.Player) {
-        console.log(obj)
-      }
-
-      return <GridSymbol obj={obj} />
+      return <GridSymbol obj={obj} key={obj.key} />
     })
 
   return <div id='grid'>{grid}{objects}</div>
