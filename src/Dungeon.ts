@@ -30,18 +30,21 @@ export function generateDungeon(): Dungeon {
         [{ x: pos.x, y: pos.y + 1 }, Direction.Down]
       ]
 
+
     check.forEach(([pos, direction]) => {
       const room = roomAt(pos)
       if (room) {
         const es = room.exits.filter(e => {
           return sideFromExit(e, 8) === direction
         }).map(keyedWrap)
+
         entrances.push(...es)
       }
     })
 
 
     let forbidden: Direction[] = []
+
     if (pos.x === 0) {
       forbidden.push(Direction.Left)
     }

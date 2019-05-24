@@ -112,10 +112,15 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   let exits: KeyedPosition[] = []
   if (entrance && entrance.length > 0) {
     exits = [...entrance]
-    forbiddenSides.push(sideFromExit(entrance[0], size))
+
+    entrance.forEach(e => {
+      forbiddenSides.push(sideFromExit(e, size))
+    })
     console.log("Adding entrance: ", entrance)
   }
   console.log("Disallowing sides: ", forbiddenSides)
+
+  forbiddenSides = _.uniq(forbiddenSides)
 
   const directionMap = {
     [Direction.Up]: { x: Infinity, y: size },
@@ -123,8 +128,6 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     [Direction.Left]: { x: -1, y: Infinity },
     [Direction.Right]: { x: size, y: Infinity },
   }
-
-  // TODO: Remove the direction that represents the existing entrance
 
   let directions: GamePosition[] = []
 
