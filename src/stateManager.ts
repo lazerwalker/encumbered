@@ -4,7 +4,7 @@ import { Item, Player } from "./Player";
 
 import _ from "lodash";
 import { keyedWrap, keyedClamp } from "./Room";
-import { roomByTakingExit } from "./Dungeon";
+import { roomByTakingExit, replaceRoom } from "./Dungeon";
 const { astar, Graph } = require('javascript-astar')
 
 export type GameReducer = (state: State) => State
@@ -83,6 +83,7 @@ function processPlayerChange(player: Player, oldState: State): State {
       console.log("WHY NO ENTRANCES", state.currentRoom.exits)
     }
 
+    state.dungeon = replaceRoom(state.dungeon, state.currentRoom)
     state.currentRoom = roomByTakingExit(state.dungeon, state.currentRoom, exits[0])
     state.player = { ...state.player, ...keyedWrap(playerPos) }
     console.log("New Room", state.currentRoom.pos)

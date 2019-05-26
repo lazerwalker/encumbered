@@ -99,3 +99,8 @@ export function dungeonRoomAt(dungeon: Dungeon, pos: GamePosition): Room {
   console.log(pos, roomKey(pos), dungeon.rooms[roomKey(pos)].pos, dungeon)
   return dungeon.rooms[roomKey(pos)]
 }
+
+export function replaceRoom(dungeon: Dungeon, room: Room): Dungeon {
+  dungeon.rooms[roomKey(room.pos)] = room
+  return dungeon
+}
