@@ -103,7 +103,7 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   }
 
   let enemies: KeyedPosition[] = []
-  const numberOfEnemies = 0 //_.filter(items, i => i.type === TileType.ItemSword).length
+  const numberOfEnemies = _.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
     enemies.push({ ...pos, key: uuid() })
