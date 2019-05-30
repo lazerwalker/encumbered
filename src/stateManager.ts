@@ -114,14 +114,18 @@ function moveEnemies(state: State): State {
     TileType.HeldItemSword
   ]
 
-  for (const enemy of newState.currentRoom.enemies) {
+  newState.currentRoom.enemies = []
+  newState.currentRoom.tiredEnemies = []
+
+  for (const enemy of state.currentRoom.enemies) {
+    let isActive = true
+
     // Before moving:
     // It's possible that the player moved one of their items into the enemy.
     // If that's the case, resolve that rather than do anything fancier.
     // (We could resolve this when we resolve item movement, but that also feels weird?)
     const item = newState.player.items.find(i => i.x + newState.player.x === enemy.x && i.y + newState.player.y === enemy.y)
     if (item) {
-      newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
       newState.currentRoom.tiredEnemies.push(enemy)
       newState.player.items = _.without(newState.player.items, item)
       continue
@@ -184,16 +188,19 @@ function moveEnemies(state: State): State {
 
         if (item.type !== TileType.ItemSword) {
           // If it's a sword, we'll just say they didn't move, rather than them consuming the item
-          newState.currentRoom.enemies = _.without(newState.currentRoom.enemies, enemy)
+          isActive = false
           newState.currentRoom.tiredEnemies.push(enemy)
           newState.player.items = _.without(newState.player.items, item)
         }
+      }
+
+      if (isActive) {
+        newState.currentRoom.enemies.push(enemy)
       }
     }
   }
 
   for (const tiredEnemy of state.currentRoom.tiredEnemies) {
-    newState.currentRoom.tiredEnemies = _.without(newState.currentRoom.enemies, tiredEnemy)
     newState.currentRoom.enemies.push(tiredEnemy)
   }
 
@@ -235,7 +242,10 @@ function avoidsWallCollisions(state: State): boolean {
 
 function resolveItemCollisions(state: State, oldState: State): State {
   let player = state.player
+  
   let enemies = _.cloneDeep(state.currentRoom.enemies)
+  let tiredEnemies = _.cloneDeep(state.currentRoom.tiredEnemies)
+
   let destroyedItems: Item[] = []
   let pickedUpItems: Item[] = []
   let destroyedHeldItems: Item[] = []
@@ -274,6 +284,13 @@ function resolveItemCollisions(state: State, oldState: State): State {
         enemies = _.without(enemies, e)
         stopMovement = true
       }
+
+      let tired = _.find(tiredEnemies, e => e.x === heldItem.x + player.x && e.y === heldItem.y + player.y)
+      if (tired) {
+        destroyedHeldItems.push(heldItem)
+        tiredEnemies = _.without(tiredEnemies, tired)
+        stopMovement = true
+      }
     }
 
   })
@@ -287,7 +304,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
   player.items.push(...pickedUpItems)
   player.items = _.without(player.items, ...destroyedHeldItems)
 
-  return { ...state, player, currentRoom: { ...state.currentRoom, enemies, items } }
+  return { ...state, player, currentRoom: { ...state.currentRoom, enemies, tiredEnemies, items } }
 }
 
 function hasExitedRoom(state: State): boolean {
