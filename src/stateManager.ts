@@ -90,7 +90,9 @@ function processPlayerChange(player: Player, oldState: State): State {
     return state
   }
 
-  state = moveEnemies(state)
+  if (state.player.x !== oldState.player.x || state.player.y !== oldState.player.y) {
+    state = moveEnemies(state)
+  }
 
   return state
 }
