@@ -204,7 +204,7 @@ function moveEnemies(state: State): State {
     newState.currentRoom.enemies.push(tiredEnemy)
   }
 
-  // console.log(newState)
+  console.log(newState)
   return newState
 }
 
@@ -268,12 +268,14 @@ function resolveItemCollisions(state: State, oldState: State): State {
   }
 
   player.items.forEach(heldItem => {
-    // Pick up items
+    // Collide with items
     let i = _.find(state.currentRoom.items, i => i.x === heldItem.x + player.x && i.y === heldItem.y + player.y)
     if (i) {
       stopMovement = true
-      destroyedItems.push(i)
-      pickedUpItems.push(pickUpItem(oldState.player, i))
+
+      // Uncomment these to reinstate katamari behavior
+      // destroyedItems.push(i)
+      // pickedUpItems.push(pickUpItem(oldState.player, i))
     }
 
     // Kill enemy!
