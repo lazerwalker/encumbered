@@ -4,7 +4,7 @@ import { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
 import { Player } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
-import { Room, generateRoom } from './Room';
+import { Room } from './Room';
 import EditorButton from './components/EditorButton'
 import { Dungeon, generateDungeon, dungeonRoomAt } from './Dungeon';
 import uuid from './uuid';
@@ -92,7 +92,11 @@ class App extends React.Component<{}, State> {
     // This touch detector stolen from Modernizr
     // Detecting touch this way is normally a bad idea!
     // in our case, I don't want to allow joystick movement on non-touch.
-    const isTouch = (('ontouchstart' in window) || (window as any).TouchEvent || (window as any).DocumentTouch && document instanceof (window as any).DocumentTouch)
+    const isTouch = (
+      ('ontouchstart' in window) ||
+      (window as any).TouchEvent ||
+      ((window as any).DocumentTouch && document instanceof (window as any).DocumentTouch)
+    )
 
     if (isTouch) {
       window.addEventListener('touchstart', this.handleTouchStart)
