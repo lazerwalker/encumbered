@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
-import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
+import { reducer } from './stateManager';
 import _ from 'lodash';
 import EditorButton from './components/EditorButton'
 import uuid from './uuid';
@@ -10,6 +10,7 @@ import { State } from './State';
 import { EnemyFactory } from './Enemy';
 import { ItemFactory } from './Item';
 import { generateDungeon, dungeonRoomAt } from './Dungeon';
+import { Action, ActionType } from './actions';
 
 const nipplejs = require('nipplejs')
 
@@ -46,7 +47,7 @@ class App extends React.Component<{}, State> {
   maybeTouch: boolean = false
 
   initialState: State
-  undoStack: GameReducer[] = []
+  undoStack: Action[] = []
 
   constructor(props: any) {
     super(props)
@@ -139,8 +140,8 @@ class App extends React.Component<{}, State> {
     );
   }
 
-  perform = (action: GameReducer, state: State = this.state): State => {
-    let result = action(state)
+  dispatch = (state: State, action: Action): State => {
+    let result = reducer(state, action)
 
     if (!_.isEqual(result, state)) {
       this.undoStack.push(action)
@@ -160,25 +161,25 @@ class App extends React.Component<{}, State> {
       clearTimeout(this.joystickTimerId)
     }
 
-    let keyMap: { [dir: string]: GameReducer } = {
-      "up": moveUp,
-      "down": moveDown,
-      "left": moveLeft,
-      "right": moveRight,
+    let keyMap: { [dir: string]: Action } = {
+      "up": { type: ActionType.MoveUp },
+      "down": { type: ActionType.MoveDown },
+      "left": { type: ActionType.MoveLeft },
+      "right": { type: ActionType.MoveRight },
     }
     const result = keyMap[e.target.direction.angle];
     if (!result) {
-      console.log("COULD NOT FIND HANDLER", e)
+      console.log("COULD NOT FIND ACTION", e)
       return
     }
 
     const repeat = () => {
-      this.setState(this.perform(result))
+      this.setState(this.dispatch(this.state, result))
       this.joystickTimerId = setTimeout(repeat, 150)
     }
 
     this.joystickTimerId = setTimeout(repeat, 300)
-    this.setState(this.perform(result))
+    this.setState(this.dispatch(this.state, result))
   }
 
   handleJoystickEnd = (e: any) => {
@@ -188,20 +189,20 @@ class App extends React.Component<{}, State> {
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
-    let keyMap: { [keyCode: string]: GameReducer } = {
-      "ArrowUp": moveUp,
-      "ArrowDown": moveDown,
-      "ArrowLeft": moveLeft,
-      "ArrowRight": moveRight,
-      "Space": release,
-      "Period": wait
+    let keyMap: { [keyCode: string]: Action } = {
+      "ArrowUp": { type: ActionType.MoveUp },
+      "ArrowDown": { type: ActionType.MoveDown },
+      "ArrowLeft": { type: ActionType.MoveLeft },
+      "ArrowRight": { type: ActionType.MoveRight },
+      "Space": { type: ActionType.Release },
+      "Period": { type: ActionType.Wait }
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {
       let state = _.cloneDeep(this.initialState)
       this.undoStack.pop()
       for (let a of this.undoStack) {
-        state = a(state)
+        state = this.dispatch(state, a)
       }
       this.setState(state)
       return
@@ -213,11 +214,11 @@ class App extends React.Component<{}, State> {
       return
     }
 
-    this.setState(this.perform(result))
+    this.setState(this.dispatch(this.state, result))
   }
 
   didTapDrop = () => {
-    this.setState(this.perform(release))
+    this.setState(this.dispatch(this.state, { type: ActionType.Release }))
   }
 
   handleTouchStart = (e: any) => {

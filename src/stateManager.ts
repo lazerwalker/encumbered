@@ -9,43 +9,19 @@ import { roomByTakingExit, replaceRoom } from "./Dungeon";
 import { moveEnemy } from "./Enemy";
 import { ActionType, Action } from "./actions";
 
-export type GameReducer = (state: State) => State
+export function reducer(state: State, action: Action): State {
+  if (action.type === ActionType.Release) {
+    const heldItems = state.items.filter(i => i.held)
+    if (heldItems.length === 0) return state
 
-// TODO: Undo queue stores actions rather than function invocations
-export function moveLeft(state: State): State {
-  return processPlayerChange(state, { type: ActionType.MoveLeft })
-}
+    heldItems.forEach(i => i.held = false)
 
-export function moveRight(state: State): State {
-  return processPlayerChange(state, { type: ActionType.MoveRight })
-}
-
-export function moveUp(state: State): State {
-  return processPlayerChange(state, { type: ActionType.MoveUp })
-}
-
-export function moveDown(state: State): State {
-  return processPlayerChange(state, { type: ActionType.MoveDown })
-
-}
-
-export function wait(state: State): State {
-  return processPlayerChange(state, { type: ActionType.Wait })
-}
-
-export function release(state: State): State {
-  const heldItems = state.items.filter(i => i.held)
-  if (heldItems.length === 0) return state
-
-  heldItems.forEach(i => i.held = false)
-
-  return {
-    ...state,
-    items: _.cloneDeep(state.items)
+    return {
+      ...state,
+      items: _.cloneDeep(state.items)
+    }
   }
-}
 
-function processPlayerChange(state: State, action: Action): State {
   let newState = processPlayerMovement(state, action)
   newState = resolveItemCollisions(newState, state)
 
@@ -107,7 +83,7 @@ function avoidsWallCollisions(state: State): boolean {
   let playerCoordinates: GamePosition[] = state.items
     .filter(i => i.held)
     .map(i => {
-      return { x: i.x + state.player.x, y: i.y + state.player.y }
+      return { x: i.x, y: i.y }
     })
   playerCoordinates.push({ x: state.player.x, y: state.player.y })
 
@@ -121,6 +97,8 @@ function avoidsWallCollisions(state: State): boolean {
 }
 
 function resolveItemCollisions(state: State, oldState: State): State {
+  // TODO: I'm not yet actually moving the held items
+  // Need to think through (and probably totally rewrite?) that flows
   let player = state.player
 
   let enemies = _.cloneDeep(state.enemies)
@@ -131,8 +109,9 @@ function resolveItemCollisions(state: State, oldState: State): State {
 
   state.items.forEach(i => {
     if (i.held) {
-      let bumpedIntoItem = _.find(state.items, j => j.x === i.x + player.x && j.y === i.y + player.y)
+      let bumpedIntoItem = _.find(state.items, j => i !== j && j.x === i.x && j.y === i.y)
       if (bumpedIntoItem) {
+        console.log("held bump?")
         stopMovement = true
 
         // Uncomment these to reinstate katamari behavior
@@ -142,7 +121,7 @@ function resolveItemCollisions(state: State, oldState: State): State {
 
       // Kill enemy!
       if (i.type === TileType.ItemSword) {
-        let e = _.find(enemies, e => e.x === i.x + player.x && e.y === i.y + player.y)
+        let e = _.find(enemies, e => e.x === i.x && e.y === i.y)
         if (e) {
           destroyedItems.push(i)
           enemies = _.without(enemies, e)
@@ -151,7 +130,9 @@ function resolveItemCollisions(state: State, oldState: State): State {
       }
     } else {
       if (i.x === player.x && i.y === player.y) {
+        console.log("Unheld bump?")
         i.held = true
+        stopMovement = true
       }
     }
   })

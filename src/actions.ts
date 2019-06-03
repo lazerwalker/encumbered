@@ -8,5 +8,6 @@ export enum ActionType {
   MoveRight = "right",
   MoveUp = "up",
   MoveDown = "down",
-  Wait = "wait"
+  Wait = "wait",
+  Release = "release"
 }

@@ -80,12 +80,7 @@ export default function (state: State): TileType[][] {
   })
 
   state.items.forEach(i => {
-    if (i.held) {
-      // TODO: x/y should always be world-relative, not player-relative
-      safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType)
-    } else {
-      safeSet(i.x, i.y, i.type)
-    }
+    safeSet(i.x, i.y, (i.held ? i.heldType : i.type))
   })
 
   safeSet(player.x, player.y, TileType.Player)
@@ -155,12 +150,7 @@ export function PrintGridCalculator(state: State): RenderObject[] {
   })
 
   state.items.forEach(i => {
-    if (i.held) {
-      // TODO: x/y should always be world-relative, not player-relative
-      safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType, i.key)
-    } else {
-      safeSet(i.x, i.y, i.type, i.key)
-    }
+    safeSet(i.x, i.y, (i.held ? i.heldType : i.type), i.key)
   })
 
   safeSet(player.x, player.y, TileType.Player, player.key)
