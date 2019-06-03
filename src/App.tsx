@@ -140,10 +140,10 @@ class App extends React.Component<{}, State> {
     );
   }
 
-  dispatch = (state: State, action: Action): State => {
+  dispatch = (state: State, action: Action, addToStack: boolean = true): State => {
     let result = reducer(state, action)
 
-    if (!_.isEqual(result, state)) {
+    if (addToStack && !_.isEqual(result, state)) {
       this.undoStack.push(action)
     }
 
@@ -154,6 +154,10 @@ class App extends React.Component<{}, State> {
     }
 
     return result
+  }
+
+  replayedDispatch = (state: State, action: Action): State => {
+    return this.dispatch(state, action, false)
   }
 
   handleJoystickMove = (e: any) => {
@@ -202,7 +206,7 @@ class App extends React.Component<{}, State> {
       let state = _.cloneDeep(this.initialState)
       this.undoStack.pop()
       for (let a of this.undoStack) {
-        state = this.dispatch(state, a)
+        state = this.replayedDispatch(state, a)
       }
       this.setState(state)
       return
