@@ -1,14 +1,15 @@
 import React from 'react';
 import './App.css';
 import { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
-import { Player } from './Player';
 import { moveLeft, GameReducer, moveUp, moveDown, moveRight, release, wait } from './stateManager';
 import _ from 'lodash';
-import { Room } from './Room';
 import EditorButton from './components/EditorButton'
-import { Dungeon, generateDungeon, dungeonRoomAt } from './Dungeon';
 import uuid from './uuid';
 import GridSymbol from './components/GridSymbol'
+import { State } from './State';
+import { EnemyFactory } from './Enemy';
+import { ItemFactory } from './Item';
+import { generateDungeon, dungeonRoomAt } from './Dungeon';
 
 const nipplejs = require('nipplejs')
 
@@ -40,21 +41,6 @@ const printGrid = (props: { tiles: RenderObject[], size: number, onClick: (x: nu
   return <div id='grid'>{grid}{objects}</div>
 }
 
-export interface State {
-  player: Player
-
-  hp: number
-  maxHP: number
-
-  exited: boolean
-  gameOver: boolean
-
-  dungeon: Dungeon
-  currentRoom: Room
-
-  selectedEditorButton?: TileType
-}
-
 class App extends React.Component<{}, State> {
   joystickTimerId: NodeJS.Timeout | undefined
   maybeTouch: boolean = false
@@ -66,6 +52,7 @@ class App extends React.Component<{}, State> {
     super(props)
 
     const dungeon = generateDungeon()
+    const room = dungeonRoomAt(dungeon, { x: 1, y: 1 })
 
     this.initialState = {
       exited: false,
@@ -75,14 +62,18 @@ class App extends React.Component<{}, State> {
       player: {
         x: 2,
         y: 2,
-        key: "player",
-        items: []
+        key: "player"
       },
+      enemies: room.enemies,
+      items: room.items,
+      size: room.size,
+      exits: room.exits,
+
+
       dungeon,
-      currentRoom: dungeonRoomAt(dungeon, { x: 1, y: 1 })
+      currentRoom: room
     }
 
-    console.log(dungeon.rooms)
     this.state = _.cloneDeep(this.initialState)
   }
 
@@ -121,9 +112,9 @@ class App extends React.Component<{}, State> {
   }
 
   render() {
-    const grid = printGrid({ tiles: PrintGridCalculator(this.state), size: this.state.currentRoom.size, onClick: this.handleEditorBoardClick })
+    const grid = printGrid({ tiles: PrintGridCalculator(this.state), size: this.state.size, onClick: this.handleEditorBoardClick })
 
-    const score = this.state.player.items.filter(i => i.type === TileType.ItemMoney).length
+    const score = this.state.items.filter(i => i.held && i.type === TileType.ItemMoney).length
 
     const editorButtons = [
       TileType.Player,
@@ -258,22 +249,16 @@ class App extends React.Component<{}, State> {
         player: { ...this.state.player, x, y }
       })
     } else if (type === TileType.Enemy) {
-      const enemies = [...this.state.currentRoom.enemies, { x, y, type, key: uuid() }]
+      const enemies = [...this.state.enemies, EnemyFactory(x, y)]
       this.setState({
         selectedEditorButton: undefined,
-        currentRoom: { ...this.state.currentRoom, enemies }
+        enemies
       })
     } else if (type === TileType.Door) {
-      const exits = [...this.state.currentRoom.exits, { x, y, key: uuid() }]
+      const exits = [...this.state.exits, { x, y, key: uuid() }]
       this.setState({
         selectedEditorButton: undefined,
-        currentRoom: { ...this.state.currentRoom, exits }
-      })
-    } else if (type === TileType.Wall) {
-      const walls = [...this.state.currentRoom.walls, { x, y, key: uuid() }]
-      this.setState({
-        selectedEditorButton: undefined,
-        currentRoom: { ...this.state.currentRoom, walls }
+        exits
       })
     } else {
       const heldType = (type: TileType): TileType => {
@@ -285,11 +270,11 @@ class App extends React.Component<{}, State> {
         return type
       }
 
-      const item = { x, y, type, heldType: heldType(type), key: uuid() }
-      const items = [...this.state.currentRoom.items, item]
+      const item = ItemFactory(x, y, type, heldType(type))
+      const items = [...this.state.items, item]
       this.setState({
         selectedEditorButton: undefined,
-        currentRoom: { ...this.state.currentRoom, items }
+        items
       })
     }
   }

@@ -1,4 +1,4 @@
-import { State } from "./App";
+import { State } from "./State";
 import _ from "lodash";
 
 export enum TileType {
@@ -41,7 +41,7 @@ export interface GamePosition {
 
 // (0, 0) is bottom-left
 export default function (state: State): TileType[][] {
-  const { size, enemies, tiredEnemies, exits, walls } = state.currentRoom
+  const { size, enemies, exits } = state
   const player = state.player
 
   let result: TileType[][] = []
@@ -75,29 +75,23 @@ export default function (state: State): TileType[][] {
   safeSet(-1, size, TileType.TopLeftCorner)
   safeSet(size, size, TileType.TopRightCorner)
 
-  walls.forEach(w => {
-    safeSet(w.x, w.y, TileType.Wall)
-  })
-
   exits.forEach(e => {
     safeSet(e.x, e.y, TileType.Door)
   })
 
-  state.currentRoom.items.forEach(i => {
-    safeSet(i.x, i.y, i.type)
+  state.items.forEach(i => {
+    if (i.held) {
+      // TODO: x/y should always be world-relative, not player-relative
+      safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType)
+    } else {
+      safeSet(i.x, i.y, i.type)
+    }
   })
 
-  state.player.items.forEach(i => {
-    safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType)
-  })
   safeSet(player.x, player.y, TileType.Player)
 
-  tiredEnemies.forEach(e => {
-    safeSet(e.x, e.y, TileType.EnemyTired)
-  })
-
   enemies.forEach(e => {
-    safeSet(e.x, e.y, TileType.Enemy)
+    safeSet(e.x, e.y, (e.tired ? TileType.EnemyTired : TileType.Enemy))
   })
 
   return result
@@ -118,7 +112,7 @@ export interface RenderObject {
 
 // (0, 0) is bottom-left
 export function PrintGridCalculator(state: State): RenderObject[] {
-  const { size, enemies, tiredEnemies, exits, walls } = state.currentRoom
+  const { size, enemies, exits } = state
   const player = state.player
 
   let result: { [pos: string]: RenderObject } = {}
@@ -156,26 +150,23 @@ export function PrintGridCalculator(state: State): RenderObject[] {
   safeSet(-1, size, TileType.TopLeftCorner, 'topLeft')
   safeSet(size, size, TileType.TopRightCorner, 'topRight')
 
-  walls.forEach((w, idx) => {
-    safeSet(w.x, w.y, TileType.Wall, w.key)
-  })
-
   exits.forEach((e, idx) => {
     safeSet(e.x, e.y, TileType.Door, e.key)
   })
 
-  state.currentRoom.items.forEach((i, idx) => {
-    safeSet(i.x, i.y, i.type, i.key)
-  })
-
-  state.player.items.forEach((i, idx) => {
-    safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType, i.key)
+  state.items.forEach(i => {
+    if (i.held) {
+      // TODO: x/y should always be world-relative, not player-relative
+      safeSet(i.x + state.player.x, i.y + state.player.y, i.heldType, i.key)
+    } else {
+      safeSet(i.x, i.y, i.type, i.key)
+    }
   })
 
   safeSet(player.x, player.y, TileType.Player, player.key)
 
-  tiredEnemies.forEach((e, idx) => {
-    safeSet(e.x, e.y, TileType.EnemyTired, e.key)
+  enemies.forEach(e => {
+    safeSet(e.x, e.y, (e.tired ? TileType.EnemyTired : TileType.Enemy), e.key)
   })
 
   enemies.forEach((e, idx) => {
@@ -192,13 +183,13 @@ export function PrintGridCalculator(state: State): RenderObject[] {
 export function boundsCoordinates(state: State): GamePosition[] {
   let result: GamePosition[] = []
 
-  for (let i = -1; i <= state.currentRoom.size; i++) {
+  for (let i = -1; i <= state.size; i++) {
     result.push({ x: -1, y: i })
-    result.push({ x: state.currentRoom.size, y: i })
+    result.push({ x: state.size, y: i })
     result.push({ x: i, y: -1 })
-    result.push({ x: i, y: state.currentRoom.size })
+    result.push({ x: i, y: state.size })
   }
 
-  const unkeyedExits = state.currentRoom.exits.map((e) => { return { x: e.x, y: e.y } })
+  const unkeyedExits = state.exits.map((e) => { return { x: e.x, y: e.y } })
   return _.differenceWith(result, unkeyedExits, _.isEqual)
 }

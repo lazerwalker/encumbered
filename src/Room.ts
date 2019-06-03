@@ -1,7 +1,8 @@
 import { GamePosition, TileType } from "./GridCalculator";
-import { Item } from "./Player";
+import { Item, ItemFactory } from "./Item";
 import _ from "lodash";
 import uuid from "./uuid";
+import { Enemy, EnemyFactory } from "./Enemy";
 
 export interface KeyedPosition {
   x: number
@@ -13,9 +14,7 @@ export interface Room {
   exits: KeyedPosition[]
   items: Item[]
   size: number
-  enemies: KeyedPosition[]
-  tiredEnemies: KeyedPosition[]
-  walls: KeyedPosition[]
+  enemies: Enemy[]
 
   pos: GamePosition
 }
@@ -102,11 +101,11 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     items.push(randomItem(pos))
   }
 
-  let enemies: KeyedPosition[] = []
+  let enemies: Enemy[] = []
   const numberOfEnemies = _.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
-    enemies.push({ ...pos, key: uuid() })
+    enemies.push(EnemyFactory(pos.x, pos.y))
   }
 
   let exits: KeyedPosition[] = []
@@ -162,8 +161,6 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     exits,
     items,
     enemies,
-    tiredEnemies: [],
-    walls: [],
     pos: coord
   }
 
@@ -178,11 +175,6 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
 
     const type = _.sample(types)!
 
-    return {
-      ...pos,
-      type: type[0],
-      heldType: type[1],
-      key: uuid()
-    }
+    return ItemFactory(pos.x, pos.y, type[0], type[1])
   }
 }
