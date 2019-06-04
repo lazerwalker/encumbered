@@ -119,7 +119,6 @@ function avoidsWallCollisions(vector: GamePosition, state: State): boolean {
       return { x: i.x + vector.x, y: i.y + vector.y }
     })
 
-  console.log("COORDINAWTES", JSON.stringify(playerCoordinates, null, 2))
   // If any player bit is over an edge, collide
   let edgeTiles = boundsCoordinates(state)
   if (_.intersectionWith(playerCoordinates, edgeTiles, _.isEqual).length > 0) {
@@ -144,14 +143,21 @@ function resolveItemCollisions(movementVector: GamePosition, state: State, oldSt
 
   state.items.forEach(i => {
     if (i.held) {
-      let bumpedIntoItem = _.find(state.items, j => i.key !== j.key && j.x === i.x && j.y === i.y)
+      oldPositions[i.key] = { x: i.x, y: i.y }
+      i.x += movementVector.x
+      i.y += movementVector.y
+
+      let bumpedIntoItem = _.find(state.items, j => {
+        return i.key !== j.key
+          && j.x === i.x
+          && j.y === i.y
+      })
+
       if (bumpedIntoItem) {
         console.log("bumped into item!")
         stopMovement = true
-      } else {
-        oldPositions[i.key] = { x: i.x, y: i.y }
-        i.x += movementVector.x
-        i.y += movementVector.y
+        i.x = oldPositions[i.key].x
+        i.y = oldPositions[i.key].y
       }
 
       // Kill enemy!
