@@ -1,5 +1,5 @@
 import { Player } from "./Player";
-import { TileType } from "./GridCalculator";
+import { TileType } from "./renderGrid";
 import { Enemy } from "./Enemy";
 import { Exit } from "./Exit";
 import { Item } from "./Item";

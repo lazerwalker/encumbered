@@ -1,4 +1,4 @@
-import { GamePosition, TileType } from "./GridCalculator";
+import { GamePosition, TileType } from "./renderGrid";
 import { Item, ItemFactory } from "./Item";
 import _ from "lodash";
 import uuid from "./uuid";
@@ -102,7 +102,7 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   }
 
   let enemies: Enemy[] = []
-  const numberOfEnemies = _.filter(items, i => i.type === TileType.ItemSword).length
+  const numberOfEnemies = 1 //_.filter(items, i => i.type === TileType.ItemSword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
     enemies.push(EnemyFactory(pos.x, pos.y))
@@ -165,16 +165,16 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   }
 
   function randomItem(pos: GamePosition) {
-    const types: [TileType, TileType][] = [
-      [TileType.ItemSword, TileType.HeldItemSword],
-      [TileType.ItemMoney, TileType.HeldItemMoney],
-      [TileType.ItemNormal, TileType.HeldItemNormal],
-      [TileType.ItemPush, TileType.HeldItemPush],
-      [TileType.ItemBlock, TileType.HeldItemBlock],
+    const types: TileType[] = [
+      TileType.ItemSword,
+      TileType.ItemMoney,
+      TileType.ItemNormal,
+      TileType.ItemPush,
+      TileType.ItemBlock
     ]
 
     const type = _.sample(types)!
 
-    return ItemFactory(pos.x, pos.y, type[0], type[1])
+    return ItemFactory(pos.x, pos.y, type, type)
   }
 }

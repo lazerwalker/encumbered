@@ -1,5 +1,5 @@
 import { State } from "./State";
-import GridCalculator, { GamePosition, boundsCoordinates, TileType } from "./GridCalculator";
+import { GamePosition, boundsCoordinates, TileType } from "./renderGrid";
 import { Item } from "./Item"
 
 import _ from "lodash";
@@ -100,6 +100,7 @@ function moveEnemies(state: State): State {
   let newState = _.cloneDeep(state)
 
   state.enemies.forEach(e => {
+    console.log(`Moving enemy with key ${e.key}`)
     newState = moveEnemy(newState, e)
   })
 
@@ -212,16 +213,16 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
   return newState
 }
 
-// TODO: It would be great for this to not use GridCalculator
+// A player has exited the room when both them and their held objects are not visible on-screen
+// Even though the bounds of the normal map are (0, size - 1), positions -1 and size are the walls/doors,
+// so we need to make sure the objects are even beyond those
 function hasExitedRoom(state: State): boolean {
-  const result = _.flatten(GridCalculator(state))
-  const types = [
-    TileType.Player,
-    TileType.HeldItemNormal,
-    TileType.HeldItemMoney,
-    TileType.HeldItemSword,
-    TileType.HeldItemPush,
-    TileType.HeldItemBlock
-  ]
-  return !_.find(result, t => _.includes(types, t))
+  let playerObjects: GamePosition[] = [...state.items.filter(i => i.held), state.player]
+
+  return !_.find(playerObjects, o => {
+    return o.x >= -1
+      && o.x <= state.size
+      && o.y >= -1
+      && o.y <= state.size
+  })
 }

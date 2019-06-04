@@ -1,5 +1,5 @@
 import { Room, generateRoom, Direction, sideFromExit, KeyedPosition, keyedWrap } from "./Room";
-import { GamePosition } from "./GridCalculator";
+import { GamePosition } from "./renderGrid";
 
 function roomKey(pos: GamePosition): string {
   return `${pos.x},${pos.y}`

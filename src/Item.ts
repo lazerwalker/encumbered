@@ -1,9 +1,8 @@
-import { TileType } from "./GridCalculator";
+import { TileType } from "./renderGrid";
 import uuid from "./uuid";
 
 export interface Item {
   type: TileType
-  heldType: TileType
 
   key: string
 
@@ -14,14 +13,17 @@ export interface Item {
   // If on a player, an offset from the player tile
   x: number
   y: number
+
+  // A single (non-HTML) character for now, will swap out with an image
+  tile: string
 }
 
-export function ItemFactory(x: number, y: number, type: TileType, heldType: TileType) {
+export function ItemFactory(x: number, y: number, tile: string, type: TileType) {
   return {
     x,
     y,
+    tile,
     type,
-    heldType,
 
     key: uuid(),
     held: false

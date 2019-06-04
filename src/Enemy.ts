@@ -1,6 +1,6 @@
 import uuid from "./uuid";
 import { State } from "./State";
-import GridCalculator, { TileType, GamePosition } from "./GridCalculator";
+import { GamePosition, boundsCoordinates } from "./renderGrid";
 import _ from "lodash";
 import { GameAnimation } from "./GameAnimation";
 
@@ -16,21 +16,12 @@ export interface Enemy {
   stunnedThisTurn: boolean
 
   currentAnimation?: GameAnimation
+
+  // A single (non-HTML) character for now, will swap out with an image
+  tile: string
 }
 
 export function moveEnemy(state: State, e: Enemy): State {
-  let passableTypes = [
-    TileType.Floor,
-    TileType.Player,
-
-    TileType.Door,
-
-    TileType.HeldItemBlock,
-    TileType.HeldItemMoney,
-    TileType.HeldItemNormal,
-    TileType.HeldItemPush
-  ]
-
   const newState = _.cloneDeep(state)
   const enemy = newState.enemies.find(f => e.key === f.key)
   if (!enemy) return state
@@ -58,28 +49,34 @@ export function moveEnemy(state: State, e: Enemy): State {
 
   // Okay, now that's over with, let's do normal pathfinding.
 
-  // TODO: Here's where the frustrating math changes need to go to allow players to be in doorways
   let graph: number[][] = [[]]
-  let grid = GridCalculator(state)
-  for (let i = 0; i < grid.length; i++) {
+  for (let i = 0; i < state.size + 2; i++) {
     graph.push([])
-    for (let j = 0; j < grid[i].length; j++) {
-      if (_.includes(passableTypes, grid[i][j])) {
-        graph[i][j] = 1
-      } else {
-        graph[i][j] = 0
-      }
+    for (let j = 0; j < state.size + 2; j++) {
+      graph[i][j] = 1
     }
   }
-  graph = graph.reverse() // Our y-axis is reversed
-  graph.shift()
+
+  // Loop through all objects, set to 0 where they shouldn't be passable
+  state.items.forEach(i => {
+    if (i.held) return
+    // We offset things
+    graph[i.y + 1][i.x + 1] = 0
+  })
+
+  // All the walls, not including exits
+  boundsCoordinates(state).forEach(pos => {
+    graph[pos.y + 1][pos.x + 1] = 0
+  })
+
+  graph.pop()
 
 
-  // console.log("%cPathfinding Grid", "font-weight: bold")
-  // console.log(`%c${graph.map((g, i) => `${i}: ${g.join("")}`).join("\n")}`, "font-family: monospace")
+  console.log("%cPathfinding Grid", "font-weight: bold")
+  console.log(`%c${graph.map((g, i) => `${i}: ${g.join("")}`).join("\n")}`, "font-family: monospace")
   let searchGraph = new Graph(graph)
 
-  // console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
+  console.log(`(${state.player.x}, ${state.player.y})`, `(${enemy.x}, ${enemy.y})`)
   const result = astar.search(
     searchGraph,
     searchGraph.grid[enemy.y + 1][enemy.x + 1],
@@ -145,6 +142,7 @@ export function EnemyFactory(x: number, y: number) {
     y,
     stunned: false,
     stunnedThisTurn: false,
+    tile: "k",
     key: uuid()
   }
 }

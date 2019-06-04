@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { TileType } from '../GridCalculator';
 
 interface Props {
-  type: TileType
+  type: string
   selected: boolean
-  onClick: (type: TileType) => void
+  onClick: (type: string) => void
 }
 
 class EditorButton extends React.Component<Props> {

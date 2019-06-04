@@ -1,5 +1,3 @@
-import { State } from "./State";
-import { Action, ActionType } from "./actions";
 import _ from "lodash";
 
 export interface Player {
@@ -7,4 +5,7 @@ export interface Player {
   y: number
 
   key: string
+
+  // A single (non-HTML) character for now, will swap out with an image
+  tile: "@"
 }

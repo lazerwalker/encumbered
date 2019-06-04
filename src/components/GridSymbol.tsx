@@ -1,4 +1,4 @@
-import { RenderObject } from "../GridCalculator";
+import { RenderObject } from "../renderGrid";
 import * as React from 'react'
 
 export default function (props: { obj: RenderObject }) {
@@ -15,8 +15,9 @@ export default function (props: { obj: RenderObject }) {
   return (
     <span
       className="symbol"
-      dangerouslySetInnerHTML={{ __html: obj.tile }}
       key={obj.key}
-      style={style} />
+      style={style}>
+      {obj.tile}
+    </span>
   )
 }

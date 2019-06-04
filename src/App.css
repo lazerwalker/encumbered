@@ -34,6 +34,7 @@ body {
   color: #eee;
   font-family: monospace;
   font-size: 60px;
+  height: 600px; /* 10 * 60, 8x8 grid plus walls */
   line-height: 60px;
   letter-spacing: 10px;
   margin: auto;
