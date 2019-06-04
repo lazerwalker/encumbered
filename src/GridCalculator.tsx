@@ -86,7 +86,7 @@ export default function (state: State): TileType[][] {
   safeSet(player.x, player.y, TileType.Player)
 
   enemies.forEach(e => {
-    safeSet(e.x, e.y, (e.tired ? TileType.EnemyTired : TileType.Enemy))
+    safeSet(e.x, e.y, (e.stunned ? TileType.EnemyTired : TileType.Enemy))
   })
 
   return result
@@ -156,7 +156,7 @@ export function PrintGridCalculator(state: State): RenderObject[] {
   safeSet(player.x, player.y, TileType.Player, player.key)
 
   enemies.forEach(e => {
-    safeSet(e.x, e.y, (e.tired ? TileType.EnemyTired : TileType.Enemy), e.key)
+    safeSet(e.x, e.y, (e.stunned ? TileType.EnemyTired : TileType.Enemy), e.key)
   })
 
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys

@@ -129,12 +129,11 @@ function collidesWithWall(vector: GamePosition, state: State): boolean {
 function resolveMovement(movementVector: GamePosition, state: State, oldState: State): State {
   // TODO: I'm not yet actually moving the held items
   // Need to think through (and probably totally rewrite?) that flows
-  let player = state.player
+  const newState = _.cloneDeep(state)
+  let player = newState.player
 
   player.x += movementVector.x
   player.y += movementVector.y
-
-  let enemies = _.cloneDeep(state.enemies)
 
   let destroyedItems: Item[] = []
 
@@ -142,27 +141,29 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
 
   let oldPositions: { [key: string]: GamePosition } = {}
 
-  state.items.forEach(i => {
+  newState.items.forEach(i => {
     if (i.held) {
       oldPositions[i.key] = { x: i.x, y: i.y }
       i.x += movementVector.x
       i.y += movementVector.y
 
-      // Kill enemy!
-      if (i.type === TileType.ItemSword) {
-        let e = _.find(enemies, e => e.x === i.x && e.y === i.y)
-        if (e) {
-          destroyedItems.push(i)
-          enemies = _.without(enemies, e)
+      // Check for enemy collisions
+      let e = _.find(newState.enemies, e => e.x === i.x && e.y === i.y)
+      if (e) {
+        if (i.type === TileType.ItemSword) {
+          newState.enemies = _.without(newState.enemies, e)
           stopMovement = true
-
-          // We've already sworded someone, don't do normal collision logic
-          return
+        } else {
+          destroyedItems.push(i)
+          e.stunned = true
+          e.stunnedThisTurn = true
+          stopMovement = true
         }
+
+        return
       }
 
-      // TODO: Moving into enemies should probably consume item / stun?
-      let bumpedIntoItem = _.find([...state.items, ...state.enemies], j => {
+      let bumpedIntoItem = _.find([...newState.items, ...newState.enemies], j => {
         return i.key !== j.key
           && j.x === i.x
           && j.y === i.y
@@ -182,9 +183,16 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
   })
 
   // If the player bumps into an enemy, ignore that movement
-  let enemy = _.find(state.enemies, e => e.x === player.x && e.y === player.y)
+  let enemy = _.find(newState.enemies, e => e.x === player.x && e.y === player.y)
   if (enemy) {
     stopMovement = true
+    newState.hp -= 1
+    if (newState.hp <= 0) {
+      newState.gameOver = true
+    }
+
+    enemy.stunned = true
+    enemy.stunnedThisTurn = true
   }
 
   if (stopMovement) {
@@ -192,7 +200,7 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
     player.x = oldState.player.x
     player.y = oldState.player.y
 
-    state.items.forEach(i => {
+    newState.items.forEach(i => {
       if (oldPositions[i.key]) {
         i.x = oldPositions[i.key].x
         i.y = oldPositions[i.key].y
@@ -200,8 +208,8 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
     })
   }
 
-  let items = _.cloneDeep(_.without(state.items, ...destroyedItems))
-  return { ...state, player, enemies, items }
+  newState.items = _.without(newState.items, ...destroyedItems)
+  return newState
 }
 
 // TODO: It would be great for this to not use GridCalculator

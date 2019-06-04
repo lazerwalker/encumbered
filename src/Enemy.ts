@@ -11,11 +11,11 @@ export interface Enemy {
 
   key: string
 
-  tired: boolean
+  stunned: boolean
+  stunnedThisTurn: boolean
 }
 
 export function moveEnemy(state: State, e: Enemy): State {
-  console.log("Moving enemy", e)
   let passableTypes = [
     TileType.Floor,
     TileType.Player,
@@ -25,16 +25,16 @@ export function moveEnemy(state: State, e: Enemy): State {
     TileType.HeldItemBlock,
     TileType.HeldItemMoney,
     TileType.HeldItemNormal,
-    TileType.HeldItemPush,
-    TileType.HeldItemSword
+    TileType.HeldItemPush
   ]
 
   const newState = _.cloneDeep(state)
   const enemy = newState.enemies.find(e => e.key === e.key)
   if (!enemy) return state
 
-  if (enemy.tired) {
-    enemy.tired = false
+  // Tired enemies ready up
+  if (enemy.stunned && !enemy.stunnedThisTurn) {
+    enemy.stunned = false
     return newState
   }
 
@@ -45,7 +45,7 @@ export function moveEnemy(state: State, e: Enemy): State {
   const item = state.items.find(i => i.held && i.x === enemy.x && i.y === enemy.y)
   if (item) {
     console.log("Tiring out")
-    enemy.tired = true
+    enemy.stunned = true
     newState.items = _.without(state.items, item)
     return newState
   }
@@ -106,10 +106,12 @@ export function moveEnemy(state: State, e: Enemy): State {
       console.log("Found item")
       enemy.x = oldPos.x
       enemy.y = oldPos.y
-      enemy.tired = true
+      enemy.stunned = true
       newState.items = _.without(newState.items, item)
     }
   }
+
+  enemy.stunnedThisTurn = false
 
   return newState
 }
@@ -118,7 +120,8 @@ export function EnemyFactory(x: number, y: number) {
   return {
     x,
     y,
-    tired: false,
+    stunned: false,
+    stunnedThisTurn: false,
     key: uuid()
   }
 }
