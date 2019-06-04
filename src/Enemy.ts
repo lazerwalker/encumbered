@@ -1,7 +1,8 @@
 import uuid from "./uuid";
 import { State } from "./State";
-import GridCalculator, { TileType } from "./GridCalculator";
+import GridCalculator, { TileType, GamePosition } from "./GridCalculator";
 import _ from "lodash";
+import { GameAnimation } from "./GameAnimation";
 
 const { astar, Graph } = require('javascript-astar')
 
@@ -13,6 +14,8 @@ export interface Enemy {
 
   stunned: boolean
   stunnedThisTurn: boolean
+
+  currentAnimation?: GameAnimation
 }
 
 export function moveEnemy(state: State, e: Enemy): State {
@@ -31,6 +34,8 @@ export function moveEnemy(state: State, e: Enemy): State {
   const newState = _.cloneDeep(state)
   const enemy = newState.enemies.find(e => e.key === e.key)
   if (!enemy) return state
+
+  delete enemy.currentAnimation
 
   // Tired enemies ready up
   if (enemy.stunned && !enemy.stunnedThisTurn) {
@@ -96,6 +101,7 @@ export function moveEnemy(state: State, e: Enemy): State {
       newState.hp -= 1
       enemy.x = oldPos.x
       enemy.y = oldPos.y
+      enemy.currentAnimation = attackAnimation(enemy, newState.player)
       if (newState.hp <= 0) {
         newState.gameOver = true
       }
@@ -106,6 +112,7 @@ export function moveEnemy(state: State, e: Enemy): State {
       console.log("Found item")
       enemy.x = oldPos.x
       enemy.y = oldPos.y
+      enemy.currentAnimation = attackAnimation(enemy, item)
       enemy.stunned = true
       newState.items = _.without(newState.items, item)
     }
@@ -114,6 +121,22 @@ export function moveEnemy(state: State, e: Enemy): State {
   enemy.stunnedThisTurn = false
 
   return newState
+}
+
+// Returns an animation representing a direction of attack
+// Diagonals aren't supported. Prioritizes x-axis over y.
+function attackAnimation(from: GamePosition, to: GamePosition): GameAnimation | undefined {
+  if (from.x > to.x) {
+    return GameAnimation.AttackLeft
+  } else if (from.x < to.x) {
+    return GameAnimation.AttackRight
+  } else if (from.y > to.y) {
+    return GameAnimation.AttackDown
+  } else if (from.y < to.y) {
+    return GameAnimation.AttackUp
+  }
+
+  return undefined
 }
 
 export function EnemyFactory(x: number, y: number) {

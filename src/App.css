@@ -45,7 +45,12 @@ body {
 
 #grid .symbol {
   position: absolute;
-  transition: top 0.05s, left 0.05s
+  transition: top 0.05s, left 0.05s;
+
+}
+
+#grid .symbol span {
+  transition: background-color 1s;
 }
 
 #drop {
@@ -86,5 +91,71 @@ body {
     line-height: 44px;
     height: 44px;
     width: 44px
+  }
+}
+
+@keyframes item-destroyed {
+  from {
+    opacity: 1
+  }
+
+  to {
+    opacity: 0
+  }
+}
+
+@keyframes attack-left {
+  0% {
+    margin-left: 0px;
+  }
+
+  50% {
+    margin-left: -40px;
+  }
+
+  100% {
+    margin-left: 0px;
+  }
+}
+
+@keyframes attack-right {
+  0% {
+    margin-left: 0px;
+  }
+
+  50% {
+    margin-left: 40px;
+  }
+
+  100% {
+    margin-left: 0px;
+  }
+}
+
+@keyframes attack-up {
+  0% {
+    margin-top: 0px;
+  }
+
+  50% {
+    margin-top: -40px;
+  }
+
+  100% {
+    margin-top: 0px;
+  }
+}
+
+@keyframes attack-down {
+  0% {
+    margin-top: 0px;
+  }
+
+  50% {
+    margin-top: 40px;
+  }
+
+  100% {
+    margin-top: 0px;
   }
 }

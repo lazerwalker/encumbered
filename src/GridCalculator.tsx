@@ -1,5 +1,6 @@
 import { State } from "./State";
 import _ from "lodash";
+import { GameAnimation } from "./GameAnimation";
 
 export enum TileType {
   Floor = "&nbsp;",
@@ -97,6 +98,7 @@ export interface RenderObject {
   x: number
   y: number
   key: string
+  animation?: GameAnimation
 }
 
 /** Tech debt warning!
@@ -112,7 +114,7 @@ export function PrintGridCalculator(state: State): RenderObject[] {
 
   let result: { [pos: string]: RenderObject } = {}
 
-  function safeSet(x: number, y: number, type: TileType, key: string) {
+  function safeSet(x: number, y: number, type: TileType, key: string, animation?: GameAnimation) {
     if (x < -1
       || x > size
       || y < -1
@@ -122,7 +124,8 @@ export function PrintGridCalculator(state: State): RenderObject[] {
       key,
       tile: type,
       y: size - y,
-      x: x + 1
+      x: x + 1,
+      animation
     }
   }
 
@@ -156,7 +159,7 @@ export function PrintGridCalculator(state: State): RenderObject[] {
   safeSet(player.x, player.y, TileType.Player, player.key)
 
   enemies.forEach(e => {
-    safeSet(e.x, e.y, (e.stunned ? TileType.EnemyTired : TileType.Enemy), e.key)
+    safeSet(e.x, e.y, (e.stunned ? TileType.EnemyTired : TileType.Enemy), e.key, e.currentAnimation)
   })
 
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys
