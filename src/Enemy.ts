@@ -37,7 +37,7 @@ export function moveEnemy(state: State, e: Enemy): State {
   // It's possible that the player moved one of their items into the enemy.
   // If that's the case, resolve that rather than do anything fancier.
   // (We could resolve this when we resolve item movement, but that also feels weird?)
-  const item = state.items.find(i => i.held && i.x + state.player.x === enemy.x && i.y + state.player.y === enemy.y)
+  const item = state.items.find(i => i.held && i.x === enemy.x && i.y === enemy.y)
   if (item) {
     console.log("Tiring out")
     enemy.tired = true
@@ -96,12 +96,14 @@ export function moveEnemy(state: State, e: Enemy): State {
       }
     }
 
-    const item = newState.items.find(i => i.held && newState.player.x + i.x === enemy.x && state.player.y + i.y === enemy.y)
+    const item = newState.items.find(i => i.held && i.x === enemy.x && i.y === enemy.y)
     if (item) {
+      console.log("Found item")
       enemy.x = oldPos.x
       enemy.y = oldPos.y
 
       if (item.type !== TileType.ItemSword) {
+        console.log("Tired!")
         // If it's a sword, we'll just say they didn't move, rather than them consuming the item
         enemy.tired = true
         newState.items = _.without(newState.items, item)
