@@ -8,6 +8,10 @@ export default function (props: { obj: RenderObject }) {
     left: `${5 + obj.x * 50}px`
   }
 
+  if (obj.isPlayer) {
+    style.backgroundColor = '#ccc'
+  }
+
   if (obj.animation) {
     style.animation = `${obj.animation} 0.2s`
   }
