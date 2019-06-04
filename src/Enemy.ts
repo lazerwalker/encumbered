@@ -33,6 +33,11 @@ export function moveEnemy(state: State, e: Enemy): State {
   const enemy = newState.enemies.find(e => e.key === e.key)
   if (!enemy) return state
 
+  if (enemy.tired) {
+    enemy.tired = false
+    return newState
+  }
+
   // Before moving:
   // It's possible that the player moved one of their items into the enemy.
   // If that's the case, resolve that rather than do anything fancier.
@@ -101,13 +106,8 @@ export function moveEnemy(state: State, e: Enemy): State {
       console.log("Found item")
       enemy.x = oldPos.x
       enemy.y = oldPos.y
-
-      if (item.type !== TileType.ItemSword) {
-        console.log("Tired!")
-        // If it's a sword, we'll just say they didn't move, rather than them consuming the item
-        enemy.tired = true
-        newState.items = _.without(newState.items, item)
-      }
+      enemy.tired = true
+      newState.items = _.without(newState.items, item)
     }
   }
 

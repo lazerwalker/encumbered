@@ -159,10 +159,6 @@ export function PrintGridCalculator(state: State): RenderObject[] {
     safeSet(e.x, e.y, (e.tired ? TileType.EnemyTired : TileType.Enemy), e.key)
   })
 
-  enemies.forEach((e, idx) => {
-    safeSet(e.x, e.y, TileType.Enemy, e.key)
-  })
-
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys
 
   return Object.values(result).filter(o => o.tile !== TileType.Floor)
