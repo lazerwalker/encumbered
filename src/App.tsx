@@ -137,6 +137,7 @@ class App extends React.Component<{}, State> {
       "left": { type: ActionType.MoveLeft },
       "right": { type: ActionType.MoveRight },
     }
+
     const result = keyMap[e.target.direction.angle];
     if (!result) {
       console.log("COULD NOT FIND ACTION", e)
@@ -165,7 +166,8 @@ class App extends React.Component<{}, State> {
       "ArrowLeft": { type: ActionType.MoveLeft },
       "ArrowRight": { type: ActionType.MoveRight },
       "Space": { type: ActionType.Release },
-      "Period": { type: ActionType.Wait }
+      "Period": { type: ActionType.Wait },
+      "KeyR": { type: ActionType.Reset, payload: this.initialState }
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {

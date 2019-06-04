@@ -6,11 +6,13 @@ import _ from "lodash";
 import { keyedWrap, keyedClamp } from "./Room";
 import { roomByTakingExit, replaceRoom } from "./Dungeon";
 import { moveEnemy } from "./Enemy";
-import { ActionType, Action } from "./actions";
+import { ActionType, Action, ResetAction } from "./actions";
 
 
 export function reducer(state: State, action: Action): State {
-  if (action.type === ActionType.Release) {
+  if (action.type === ActionType.Reset) {
+    return (action as ResetAction).payload
+  } else if (action.type === ActionType.Release) {
     return release(state)
   } else if (action.type === ActionType.Wait) {
     return moveEnemies(state)

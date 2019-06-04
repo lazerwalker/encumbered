@@ -1,7 +1,11 @@
-export interface Action {
+import { State } from "./State";
+
+interface BaseAction {
   type: ActionType
   payload?: any
 }
+
+export type Action = BaseAction | ResetAction
 
 export enum ActionType {
   MoveLeft = "left",
@@ -9,5 +13,12 @@ export enum ActionType {
   MoveUp = "up",
   MoveDown = "down",
   Wait = "wait",
-  Release = "release"
+  Release = "release",
+
+  Reset = "reset"
+}
+
+export interface ResetAction {
+  type: ActionType.Reset,
+  payload: State
 }
