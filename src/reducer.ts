@@ -16,6 +16,21 @@ export function reducer(state: State, action: Action): State {
     return release(state)
   } else if (action.type === ActionType.Wait) {
     return moveEnemies(state)
+  } else if (action.type === ActionType.Heal) {
+    const potion = state.items.find(i => i.held && i.type === TileType.Potion)
+    if (!potion) return state
+
+    // TODO: Animation or something?
+    if (potion.charges < 1) return state
+
+    // Sigh, this really begs for lenses
+    const newState = _.cloneDeep(state)
+    const thePotion = newState.items.find(i => i.key === potion.key)!
+
+    thePotion.charges -= 1
+    newState.hp += 1
+
+    return newState
   } else { // For now, this is just movement
     const vector = movementVector(action)
 

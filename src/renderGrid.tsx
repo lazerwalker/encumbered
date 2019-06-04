@@ -13,6 +13,7 @@ export enum TileType {
   Potion = "!",
   Wand = "/",
   Shield = "]",
+  UnknownItem = "?",
 
   VerticalWall = "│",
   HorizontalWall = "─",

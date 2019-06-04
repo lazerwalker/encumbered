@@ -16,15 +16,16 @@ export interface Item {
 
   // A single (non-HTML) character for now, will swap out with an image
   tile: string
+
+  // Not all item types have charges, but I think this is a useful abstraction?
+  charges: number
 }
 
-export function ItemFactory(x: number, y: number, tile: string, type: TileType) {
+/** Please please please pass in at least x, y, tile, type. */
+export function ItemFactory(props: any): Item {
   return {
-    x,
-    y,
-    tile,
-    type,
-
+    x: -1, y: -1, tile: " ", type: TileType.UnknownItem,
+    ...props,
     key: uuid(),
     held: false
   }

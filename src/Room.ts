@@ -165,16 +165,16 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   }
 
   function randomItem(pos: GamePosition) {
-    const types: TileType[] = [
-      TileType.Sword,
-      TileType.Money,
-      TileType.Potion,
-      TileType.ItemPush,
-      TileType.ItemBlock
+    const factories = [
+      { type: TileType.Sword, tile: TileType.Sword },
+      { type: TileType.Money, tile: TileType.Money },
+      { type: TileType.Potion, tile: TileType.Potion, charges: 1 },
+      { type: TileType.Wand, tile: TileType.Wand },
+      { type: TileType.Shield, tile: TileType.Shield },
     ]
 
-    const type = _.sample(types)!
+    const data = { ..._.sample(factories)!, ...pos }
 
-    return ItemFactory(pos.x, pos.y, type, type)
+    return ItemFactory(data)
   }
 }
