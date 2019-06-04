@@ -32,7 +32,7 @@ export function moveEnemy(state: State, e: Enemy): State {
   ]
 
   const newState = _.cloneDeep(state)
-  const enemy = newState.enemies.find(e => e.key === e.key)
+  const enemy = newState.enemies.find(f => e.key === f.key)
   if (!enemy) return state
 
   delete enemy.currentAnimation
