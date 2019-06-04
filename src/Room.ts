@@ -102,7 +102,7 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
   }
 
   let enemies: Enemy[] = []
-  const numberOfEnemies = 1 //_.filter(items, i => i.type === TileType.ItemSword).length
+  const numberOfEnemies = 1 //_.filter(items, i => i.type === TileType.Sword).length
   for (let i = 0; i < numberOfEnemies; i++) {
     let pos = allCoordinates.shift()!
     enemies.push(EnemyFactory(pos.x, pos.y))
@@ -166,9 +166,9 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
 
   function randomItem(pos: GamePosition) {
     const types: TileType[] = [
-      TileType.ItemSword,
-      TileType.ItemMoney,
-      TileType.ItemNormal,
+      TileType.Sword,
+      TileType.Money,
+      TileType.Potion,
       TileType.ItemPush,
       TileType.ItemBlock
     ]

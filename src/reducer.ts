@@ -153,7 +153,7 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
       // Check for enemy collisions
       let e = _.find(newState.enemies, e => e.x === i.x && e.y === i.y)
       if (e) {
-        if (i.type === TileType.ItemSword) {
+        if (i.type === TileType.Sword) {
           newState.enemies = _.without(newState.enemies, e)
           stopMovement = true
         } else {

@@ -8,11 +8,11 @@ export enum TileType {
   Enemy = "K",
   EnemyTired = "k",
 
-  ItemSword = "†",
-  ItemMoney = "$",
-  ItemNormal = "!",
-  ItemPush = "O",
-  ItemBlock = "+",
+  Sword = "†",
+  Money = "$",
+  Potion = "!",
+  Wand = "/",
+  Shield = "]",
 
   VerticalWall = "│",
   HorizontalWall = "─",

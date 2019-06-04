@@ -96,7 +96,7 @@ class App extends React.Component<{}, State> {
   render() {
     const grid = printGrid({ tiles: renderGrid(this.state), size: this.state.size })
 
-    const score = this.state.items.filter(i => i.held && i.type === TileType.ItemMoney).length
+    const score = this.state.items.filter(i => i.held && i.type === TileType.Money).length
 
     return (
       <div className="App">
