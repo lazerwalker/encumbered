@@ -147,19 +147,6 @@ function resolveItemCollisions(movementVector: GamePosition, state: State, oldSt
       i.x += movementVector.x
       i.y += movementVector.y
 
-      let bumpedIntoItem = _.find(state.items, j => {
-        return i.key !== j.key
-          && j.x === i.x
-          && j.y === i.y
-      })
-
-      if (bumpedIntoItem) {
-        console.log("bumped into item!")
-        stopMovement = true
-        i.x = oldPositions[i.key].x
-        i.y = oldPositions[i.key].y
-      }
-
       // Kill enemy!
       if (i.type === TileType.ItemSword) {
         let e = _.find(enemies, e => e.x === i.x && e.y === i.y)
@@ -167,11 +154,25 @@ function resolveItemCollisions(movementVector: GamePosition, state: State, oldSt
           destroyedItems.push(i)
           enemies = _.without(enemies, e)
           stopMovement = true
+
+          // We've already sworded someone, don't do normal collision logic
+          return
         }
+      }
+
+      let bumpedIntoItem = _.find([...state.items, ...state.enemies], j => {
+        return i.key !== j.key
+          && j.x === i.x
+          && j.y === i.y
+      })
+
+      if (bumpedIntoItem) {
+        stopMovement = true
+        i.x = oldPositions[i.key].x
+        i.y = oldPositions[i.key].y
       }
     } else {
       if (i.x === player.x && i.y === player.y) {
-        console.log("Unheld bump?")
         i.held = true
         stopMovement = true
       }
