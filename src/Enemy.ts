@@ -14,7 +14,8 @@ export interface Enemy {
   tired: boolean
 }
 
-export function moveEnemy(state: State, enemy: Enemy): State {
+export function moveEnemy(state: State, e: Enemy): State {
+  console.log("Moving enemy", e)
   let passableTypes = [
     TileType.Floor,
     TileType.Player,
@@ -28,16 +29,22 @@ export function moveEnemy(state: State, enemy: Enemy): State {
     TileType.HeldItemSword
   ]
 
+  const newState = _.cloneDeep(state)
+  const enemy = newState.enemies.find(e => e.key === e.key)
+  if (!enemy) return state
+
   // Before moving:
   // It's possible that the player moved one of their items into the enemy.
   // If that's the case, resolve that rather than do anything fancier.
   // (We could resolve this when we resolve item movement, but that also feels weird?)
   const item = state.items.find(i => i.held && i.x + state.player.x === enemy.x && i.y + state.player.y === enemy.y)
   if (item) {
+    console.log("Tiring out")
     enemy.tired = true
-    state.items = _.without(state.items, item)
-    return state
+    newState.items = _.without(state.items, item)
+    return newState
   }
+
 
   // Okay, now that's over with, let's do normal pathfinding.
 
@@ -78,18 +85,18 @@ export function moveEnemy(state: State, enemy: Enemy): State {
 
     enemy.x = newPos.x
     enemy.y = newPos.y
-    // console.log(newPos)
+    console.log(newPos)
 
-    if (state.player.x === enemy.x && state.player.y === enemy.y) {
-      state.hp -= 1
+    if (newState.player.x === enemy.x && newState.player.y === enemy.y) {
+      newState.hp -= 1
       enemy.x = oldPos.x
       enemy.y = oldPos.y
-      if (state.hp <= 0) {
-        state.gameOver = true
+      if (newState.hp <= 0) {
+        newState.gameOver = true
       }
     }
 
-    const item = state.items.find(i => i.held && state.player.x + i.x === enemy.x && state.player.y + i.y === enemy.y)
+    const item = newState.items.find(i => i.held && newState.player.x + i.x === enemy.x && state.player.y + i.y === enemy.y)
     if (item) {
       enemy.x = oldPos.x
       enemy.y = oldPos.y
@@ -97,12 +104,12 @@ export function moveEnemy(state: State, enemy: Enemy): State {
       if (item.type !== TileType.ItemSword) {
         // If it's a sword, we'll just say they didn't move, rather than them consuming the item
         enemy.tired = true
-        state.items = _.without(state.items, item)
+        newState.items = _.without(newState.items, item)
       }
     }
   }
 
-  return state
+  return newState
 }
 
 export function EnemyFactory(x: number, y: number) {

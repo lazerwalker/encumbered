@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { TileType, RenderObject, PrintGridCalculator } from './GridCalculator';
-import { reducer } from './stateManager';
+import { reducer } from './reducer';
 import _ from 'lodash';
 import EditorButton from './components/EditorButton'
 import uuid from './uuid';
