@@ -1,13 +1,13 @@
-import { Player } from "./Player";
 import { TileType } from "./renderGrid";
 import { Enemy } from "./Enemy";
 import { Exit } from "./Exit";
 import { Item } from "./Item";
 import { Dungeon } from "./Dungeon";
 import { Room } from "./Room";
+import { GameObject } from "./GameObject";
 
 export interface State {
-  player: Player
+  player: GameObject
 
   hp: number
   maxHP: number

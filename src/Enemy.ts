@@ -3,22 +3,15 @@ import { State } from "./State";
 import { GamePosition, boundsCoordinates } from "./renderGrid";
 import _ from "lodash";
 import { GameAnimation } from "./GameAnimation";
+import { GameObject } from "./GameObject";
 
 const { astar, Graph } = require('javascript-astar')
 
-export interface Enemy {
-  x: number
-  y: number
-
-  key: string
-
+export interface Enemy extends GameObject {
   stunned: boolean
   stunnedThisTurn: boolean
 
   currentAnimation?: GameAnimation
-
-  // A single (non-HTML) character for now, will swap out with an image
-  tile: string
 }
 
 export function moveEnemy(state: State, e: Enemy): State {

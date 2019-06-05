@@ -9,7 +9,15 @@ export default function (props: { obj: RenderObject }) {
   }
 
   if (obj.isPlayer) {
-    style.backgroundColor = '#ccc'
+    style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+  }
+
+  let text = obj.tile
+
+  if (!obj.tile) { console.log(obj) }
+  if (obj.tile && obj.tile.indexOf && obj.tile.indexOf(".png") !== -1) {
+    text = ""
+    style.backgroundImage = `url('assets/${obj.tile}')`
   }
 
   if (obj.animation) {
@@ -21,7 +29,7 @@ export default function (props: { obj: RenderObject }) {
       className="symbol"
       key={obj.key}
       style={style}>
-      {obj.tile}
+      {text}
     </span>
   )
 }

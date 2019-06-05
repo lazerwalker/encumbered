@@ -79,14 +79,14 @@ export default function renderGrid(state: State): RenderObject[] {
   })
 
   state.items.forEach(i => {
-    safeSet(i.x, i.y, i.tile, i.key, i.held)
+    safeSet(i.x, i.y, i.tile!, i.key, i.held)
   })
 
-  safeSet(player.x, player.y, player.tile, player.key, true)
+  safeSet(player.x, player.y, player.sprite!, player.key, true)
 
   enemies.forEach(e => {
     // TODO: This loses 'stunned' state
-    safeSet(e.x, e.y, e.tile, e.key, false, e.currentAnimation)
+    safeSet(e.x, e.y, e.tile!, e.key, false, e.currentAnimation)
   })
 
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys

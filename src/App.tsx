@@ -7,6 +7,7 @@ import GridSymbol from './components/GridSymbol'
 import { State } from './State';
 import { generateDungeon, dungeonRoomAt } from './Dungeon';
 import { Action, ActionType } from './actions';
+import { PlayerFactory } from './Player';
 
 const nipplejs = require('nipplejs')
 
@@ -40,12 +41,7 @@ class App extends React.Component<{}, State> {
       gameOver: false,
       hp: 3,
       maxHP: 3,
-      player: {
-        x: 2,
-        y: 2,
-        key: "player",
-        tile: "@"
-      },
+      player: PlayerFactory(2, 2),
       enemies: room.enemies,
       items: room.items,
       size: room.size,

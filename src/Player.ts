@@ -1,11 +1,9 @@
-import _ from "lodash";
+import { GameObject } from "./GameObject";
 
-export interface Player {
-  x: number
-  y: number
-
-  key: string
-
-  // A single (non-HTML) character for now, will swap out with an image
-  tile: "@"
+export function PlayerFactory(x: number, y: number): GameObject {
+  return {
+    x, y,
+    key: "player",
+    sprite: "@.png"
+  }
 }
