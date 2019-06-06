@@ -14,8 +14,10 @@ export function rotate(state: State): State {
     "0, -1": { x: -1, y: 0 }
   }
 
-  newState.items
+  const heldItems = newState.items
     .filter(i => i.held)
+
+  heldItems
     .forEach(i => {
       const vector = {
         x: state.player.x - i.x,
@@ -26,5 +28,9 @@ export function rotate(state: State): State {
       i.y = state.player.y - newVector.y
     })
 
-  return newState
+  const hasNoCollisions = heldItems.reduce((acc, i) => {
+    return acc && !newState.items.find(j => i !== j && i.x === j.x && i.y === j.y)
+  }, true)
+
+  return hasNoCollisions ? newState : state
 }
