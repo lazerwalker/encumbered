@@ -7,6 +7,7 @@ import { keyedWrap, keyedClamp } from "./Room";
 import { roomByTakingExit, replaceRoom } from "./Dungeon";
 import { moveEnemy } from "./Enemy";
 import { ActionType, Action, ResetAction } from "./actions";
+import { rotate } from "./rotate";
 
 
 export function reducer(state: State, action: Action): State {
@@ -14,6 +15,8 @@ export function reducer(state: State, action: Action): State {
     return (action as ResetAction).payload
   } else if (action.type === ActionType.Release) {
     return release(state)
+  } else if (action.type === ActionType.Rotate) {
+    return rotate(state)
   } else if (action.type === ActionType.Wait) {
     return moveEnemies(state)
   } else if (action.type === ActionType.Heal) {

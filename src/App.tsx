@@ -164,9 +164,11 @@ class App extends React.Component<{}, State> {
       "Space": { type: ActionType.Release },
       "Period": { type: ActionType.Wait },
 
-      "KeyR": { type: ActionType.Reset, payload: this.initialState },
+      // "KeyR": { type: ActionType.Reset, payload: this.initialState },
 
-      "KeyQ": { type: ActionType.Heal }
+      "KeyQ": { type: ActionType.Heal },
+      "KeyR": { type: ActionType.Rotate }
+
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {
