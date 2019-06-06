@@ -4,6 +4,5 @@ export interface GameObject {
 
   key: string
 
-  tile?: string
-  sprite?: string
+  sprite: ((obj: GameObject) => string)
 }

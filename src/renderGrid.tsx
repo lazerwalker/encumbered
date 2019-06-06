@@ -62,31 +62,31 @@ export default function renderGrid(state: State): RenderObject[] {
   }
 
   for (let i = -1; i <= size; i++) {
-    safeSet(i, -1, TileType.HorizontalWall, `leftWall-${i}`)
-    safeSet(i, size, TileType.HorizontalWall, `rightWall-${i}`)
+    safeSet(i, -1, "wall-horizontal.png", `bottomWall-${i}`)
+    safeSet(i, size, "wall-horizontal.png", `topWall-${i}`)
 
-    safeSet(-1, i, TileType.VerticalWall, `bottomWall-${i}`)
-    safeSet(size, i, TileType.VerticalWall, `topWall-${i}`)
+    safeSet(-1, i, "wall-vertical.png", `leftWall-${i}`)
+    safeSet(size, i, "wall-vertical.png", `rightWall-${i}`)
   }
 
-  safeSet(-1, -1, TileType.BottomLeftCorner, 'bottomLeft')
-  safeSet(size, -1, TileType.BottomRightCorner, 'bottomRight')
-  safeSet(-1, size, TileType.TopLeftCorner, 'topLeft')
-  safeSet(size, size, TileType.TopRightCorner, 'topRight')
+  safeSet(-1, -1, "wall-bottom-left.png", 'bottomLeft')
+  safeSet(size, -1, "wall-bottom-right.png", 'bottomRight')
+  safeSet(-1, size, "wall-top-left.png", 'topLeft')
+  safeSet(size, size, "wall-top-right.png", 'topRight')
 
   exits.forEach((e, idx) => {
-    safeSet(e.x, e.y, TileType.Door, e.key)
+    safeSet(e.x, e.y, "hash.png", e.key)
   })
 
   state.items.forEach(i => {
-    safeSet(i.x, i.y, i.tile!, i.key, i.held)
+    safeSet(i.x, i.y, i.sprite(i), i.key, i.held)
   })
 
-  safeSet(player.x, player.y, player.sprite!, player.key, true)
+  safeSet(player.x, player.y, player.sprite(player), player.key, true)
 
   enemies.forEach(e => {
     // TODO: This loses 'stunned' state
-    safeSet(e.x, e.y, e.tile!, e.key, false, e.currentAnimation)
+    safeSet(e.x, e.y, e.sprite(e), e.key, false, e.currentAnimation)
   })
 
   // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys

@@ -14,6 +14,14 @@ export interface Enemy extends GameObject {
   currentAnimation?: GameAnimation
 }
 
+const sprite = (enemy: GameObject) => {
+  if ((enemy as Enemy).stunned) {
+    return "kobold-stunned.png"
+  } else {
+    return "kobold.png"
+  }
+}
+
 export function moveEnemy(state: State, e: Enemy): State {
   const newState = _.cloneDeep(state)
   const enemy = newState.enemies.find(f => e.key === f.key)
@@ -135,7 +143,7 @@ export function EnemyFactory(x: number, y: number) {
     y,
     stunned: false,
     stunnedThisTurn: false,
-    tile: "k",
+    sprite: sprite,
     key: uuid()
   }
 }

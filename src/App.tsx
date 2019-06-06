@@ -166,7 +166,7 @@ class App extends React.Component<{}, State> {
 
       "KeyR": { type: ActionType.Reset, payload: this.initialState },
 
-      "KeyH": { type: ActionType.Heal }
+      "KeyQ": { type: ActionType.Heal }
     }
 
     if (e.code === 'KeyU' || e.code === "KeyZ") {

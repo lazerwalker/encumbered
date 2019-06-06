@@ -168,7 +168,7 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     const factories = [
       { type: TileType.Sword, tile: TileType.Sword },
       { type: TileType.Money, tile: TileType.Money },
-      { type: TileType.Potion, tile: TileType.Potion, charges: 1 },
+      { type: TileType.Potion, tile: TileType.Potion, charges: 2 },
       { type: TileType.Wand, tile: TileType.Wand },
       { type: TileType.Shield, tile: TileType.Shield },
     ]

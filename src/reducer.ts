@@ -17,12 +17,14 @@ export function reducer(state: State, action: Action): State {
   } else if (action.type === ActionType.Wait) {
     return moveEnemies(state)
   } else if (action.type === ActionType.Heal) {
+    console.log("Trying to heal", state.items)
     const potion = state.items.find(i => i.held && i.type === TileType.Potion)
+    console.log(potion)
     if (!potion) return state
-
+    console.log("Checking charges")
     // TODO: Animation or something?
     if (potion.charges < 1) return state
-
+    console.log("Do the thing")
     // Sigh, this really begs for lenses
     const newState = _.cloneDeep(state)
     const thePotion = newState.items.find(i => i.key === potion.key)!
