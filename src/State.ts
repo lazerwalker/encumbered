@@ -1,6 +1,5 @@
 import { TileType } from "./renderGrid";
 import { Enemy } from "./Enemy";
-import { Exit } from "./Exit";
 import { Item } from "./Item";
 import { Dungeon } from "./Dungeon";
 import { Room } from "./Room";
@@ -21,7 +20,7 @@ export interface State {
 
   enemies: Enemy[]
   items: Item[]
-  exits: Exit[]
+  exits: GameObject[]
 
   size: number
 

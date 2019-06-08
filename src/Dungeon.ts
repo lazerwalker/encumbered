@@ -1,5 +1,6 @@
-import { Room, generateRoom, Direction, sideFromExit, KeyedPosition, keyedWrap } from "./Room";
+import { Room, generateRoom, Direction, sideFromExit, keyedWrap } from "./Room";
 import { GamePosition } from "./renderGrid";
+import { GameObject } from "./GameObject";
 
 function roomKey(pos: GamePosition): string {
   return `${pos.x},${pos.y}`
@@ -20,7 +21,7 @@ export function generateDungeon(): Dungeon {
   }
 
   const tryToGenerateRoom = (pos: GamePosition): Room => {
-    let entrances: KeyedPosition[] = []
+    let entrances: GameObject[] = []
 
     const check: [GamePosition, Direction][] =
       [

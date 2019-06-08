@@ -1,17 +1,13 @@
 import { GamePosition, TileType } from "./renderGrid";
 import { Item, ItemFactory } from "./Item";
 import _ from "lodash";
-import uuid from "./uuid";
 import { Enemy, EnemyFactory } from "./Enemy";
+import { ExitFactory } from "./Exit";
+import { GameObject } from "./GameObject";
 
-export interface KeyedPosition {
-  x: number
-  y: number
-  key: string
-}
 
 export interface Room {
-  exits: KeyedPosition[]
+  exits: GameObject[]
   items: Item[]
   size: number
   enemies: Enemy[]
@@ -42,8 +38,8 @@ function wrap(pos: GamePosition): GamePosition {
   }
 }
 
-export function keyedWrap(pos: KeyedPosition): KeyedPosition {
-  return { ...wrap(pos), key: pos.key }
+export function keyedWrap(obj: GameObject): GameObject {
+  return { ...obj, ...wrap(obj) }
 }
 
 function clamp(pos: GamePosition, size: number = 8): GamePosition {
@@ -60,8 +56,8 @@ function clamp(pos: GamePosition, size: number = 8): GamePosition {
   }
 }
 
-export function keyedClamp(pos: KeyedPosition): KeyedPosition {
-  return { ...clamp(pos), key: pos.key }
+export function keyedClamp(obj: GameObject): GameObject {
+  return { ...obj, ...clamp(obj) }
 }
 
 export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
@@ -79,7 +75,7 @@ export function sideFromExit(exit: GamePosition, size: number = 8): Direction {
   return Direction.Left
 }
 
-export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], forbiddenSides: Direction[] = []): Room {
+export function generateRoom(coord: GamePosition, entrance?: GameObject[], forbiddenSides: Direction[] = []): Room {
   const size = 8
 
   console.log("GENERATEROOM!", coord, entrance, forbiddenSides)
@@ -108,7 +104,7 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     enemies.push(EnemyFactory(pos.x, pos.y))
   }
 
-  let exits: KeyedPosition[] = []
+  let exits: GameObject[] = []
   if (entrance && entrance.length > 0) {
     exits = [...entrance]
 
@@ -145,14 +141,15 @@ export function generateRoom(coord: GamePosition, entrance?: KeyedPosition[], fo
     const doorSize = _.sample([1, 2, 2, 2, 3, 3, 4])!
     const start = _.random(0, size - 1 - doorSize)
     for (let j = 0; j < doorSize; j++) {
-      let e = { x: template.x, y: template.y } // lol TS
-      if (e.x === Infinity) {
-        e.x = start + j
-      } else if (e.y === Infinity) {
-        e.y = start + j
+      let x = template.x
+      let y = template.y
+      if (x === Infinity) {
+        x = start + j
+      } else if (y === Infinity) {
+        y = start + j
       }
 
-      exits.push({ ...e, key: uuid() })
+      exits.push(ExitFactory(x, y))
     }
   }
 

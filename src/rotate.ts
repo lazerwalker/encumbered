@@ -1,7 +1,6 @@
 import { State } from "./State";
 import _ from "lodash";
 import { GamePosition } from "./renderGrid";
-import { PlayerFactory } from "./Player";
 
 // Move each held item 90 degrees clockwise
 export function rotate(state: State): State {

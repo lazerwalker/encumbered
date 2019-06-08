@@ -1,6 +1,9 @@
 import { State } from "./State";
 import _ from "lodash";
 import { GameAnimation } from "./GameAnimation";
+import { GameObject } from "./GameObject";
+import { Item } from "./Item";
+import { Enemy } from "./Enemy";
 
 export enum TileType {
   Door = "#",
@@ -40,58 +43,69 @@ export interface RenderObject {
 
 // (0, 0) is bottom-left
 export default function renderGrid(state: State): RenderObject[] {
-  const { size, enemies, exits } = state
-  const player = state.player
+  const { size, enemies, exits, player, items } = state
 
-  let result: { [pos: string]: RenderObject } = {}
+  function toRenderObject(obj: GameObject): RenderObject {
+    let isPlayer = false
+    if ((obj as Item).held) {
+      isPlayer = (obj as Item).held
+    }
 
-  function safeSet(x: number, y: number, tile: string, key: string, isPlayer: boolean = false, animation?: GameAnimation) {
-    if (x < -1
-      || x > size
-      || y < -1
-      || y > size) { return }
+    if (obj.key === "player") {
+      isPlayer = true
+    }
 
-    result[`${size - y},${x + 1}`] = {
-      key,
-      tile,
-      y: size - y,
-      x: x + 1,
+    let animation: GameAnimation | undefined
+    if ((obj as Enemy).currentAnimation) {
+      animation = (obj as Enemy).currentAnimation
+    }
+
+    return {
+      x: obj.x + 1,
+      y: size - obj.y,
+      key: obj.key,
+      isPlayer,
       animation,
-      isPlayer: isPlayer
+      tile: obj.sprite(obj)
     }
   }
 
-  for (let i = -1; i <= size; i++) {
-    safeSet(i, -1, "wall-horizontal.png", `bottomWall-${i}`)
-    safeSet(i, size, "wall-horizontal.png", `topWall-${i}`)
-
-    safeSet(-1, i, "wall-vertical.png", `leftWall-${i}`)
-    safeSet(size, i, "wall-vertical.png", `rightWall-${i}`)
+  function makeWall(x: number, y: number, sprite: string, key: string): GameObject | undefined {
+    if (_.find(exits, e => e.x === x && e.y === y)) {
+      return
+    } else {
+      return {
+        x, y, key,
+        sprite: (obj) => sprite
+      }
+    }
   }
 
-  safeSet(-1, -1, "wall-bottom-left.png", 'bottomLeft')
-  safeSet(size, -1, "wall-bottom-right.png", 'bottomRight')
-  safeSet(-1, size, "wall-top-left.png", 'topLeft')
-  safeSet(size, size, "wall-top-right.png", 'topRight')
+  const gameObjects: (GameObject | undefined)[] = [player, ...exits, ...enemies, ...items]
 
-  exits.forEach((e, idx) => {
-    safeSet(e.x, e.y, "hash.png", e.key)
-  })
+  for (let i = 0; i <= size - 1; i++) {
+    gameObjects.push(makeWall(i, -1, "wall-horizontal.png", `bottomWall-${i}`))
+    gameObjects.push(makeWall(i, size, "wall-horizontal.png", `topWall-${i}`))
 
-  state.items.forEach(i => {
-    safeSet(i.x, i.y, i.sprite(i), i.key, i.held)
-  })
+    gameObjects.push(makeWall(-1, i, "wall-vertical.png", `leftWall-${i}`))
+    gameObjects.push(makeWall(size, i, "wall-vertical.png", `rightWall-${i}`))
+  }
 
-  safeSet(player.x, player.y, player.sprite(player), player.key, true)
+  gameObjects.push(makeWall(-1, -1, "wall-bottom-left.png", 'bottomLeft'))
+  gameObjects.push(makeWall(size, -1, "wall-bottom-right.png", 'bottomRight'))
+  gameObjects.push(makeWall(-1, size, "wall-top-left.png", 'topLeft'))
+  gameObjects.push(makeWall(size, size, "wall-top-right.png", 'topRight'))
 
-  enemies.forEach(e => {
-    // TODO: This loses 'stunned' state
-    safeSet(e.x, e.y, e.sprite(e), e.key, false, e.currentAnimation)
-  })
+  let trimmedObjects: GameObject[] = gameObjects.filter(o => !_.isUndefined(o)) as GameObject[]
 
-  // TODO: May need to do some work to ensure that enemies/tiredEnemies and items/heldItems maintain keys
-
-  return Object.values(result)
+  return trimmedObjects
+    .map(toRenderObject)
+    .filter(r => {
+      return (r.x >= 0
+        && r.x <= size + 1
+        && r.y >= 0
+        && r.y <= size + 1)
+    })
 }
 
 
