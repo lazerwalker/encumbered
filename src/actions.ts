@@ -20,7 +20,8 @@ export enum ActionType {
   Reset = "reset",
 
   Heal = "heal",
-  Rotate = "rotate"
+  Rotate = "rotate",
+  Fill = "fill"
 }
 
 export interface ResetAction {

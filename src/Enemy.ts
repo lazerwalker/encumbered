@@ -4,14 +4,13 @@ import { GamePosition, boundsCoordinates } from "./renderGrid";
 import _ from "lodash";
 import { GameAnimation } from "./GameAnimation";
 import { GameObject } from "./GameObject";
+import { attackAnimation } from "./attackAnimation";
 
 const { astar, Graph } = require('javascript-astar')
 
 export interface Enemy extends GameObject {
   stunned: boolean
   stunnedThisTurn: boolean
-
-  currentAnimation?: GameAnimation
 }
 
 const sprite = (enemy: GameObject) => {
@@ -123,22 +122,6 @@ export function moveEnemy(state: State, e: Enemy): State {
   enemy.stunnedThisTurn = false
 
   return newState
-}
-
-// Returns an animation representing a direction of attack
-// Diagonals aren't supported. Prioritizes x-axis over y.
-function attackAnimation(from: GamePosition, to: GamePosition): GameAnimation | undefined {
-  if (from.x > to.x) {
-    return GameAnimation.AttackLeft
-  } else if (from.x < to.x) {
-    return GameAnimation.AttackRight
-  } else if (from.y > to.y) {
-    return GameAnimation.AttackDown
-  } else if (from.y < to.y) {
-    return GameAnimation.AttackUp
-  }
-
-  return undefined
 }
 
 export function EnemyFactory(x: number, y: number) {

@@ -4,11 +4,13 @@ import _ from "lodash";
 import { Enemy, EnemyFactory } from "./Enemy";
 import { ExitFactory } from "./Exit";
 import { GameObject } from "./GameObject";
+import { FountainFactory } from "./Fountain";
 
 
 export interface Room {
   exits: GameObject[]
   items: Item[]
+  floorItems: GameObject[],
   size: number
   enemies: Enemy[]
 
@@ -89,13 +91,19 @@ export function generateRoom(coord: GamePosition, entrance?: GameObject[], forbi
 
   allCoordinates = _.shuffle(allCoordinates)
 
-  const numberOfItems = _.random(3, 8)
+  const numberOfItems = _.random(3, 8) + 1
   let items: Item[] = []
+
+  let floorItems: GameObject[] = []
+
+  let fountainCoords = allCoordinates.shift()!
+  floorItems.push(FountainFactory(fountainCoords.x, fountainCoords.y))
 
   for (let i = 0; i < numberOfItems; i++) {
     let pos = allCoordinates.shift()!
     items.push(randomItem(pos))
   }
+
 
   let enemies: Enemy[] = []
   const numberOfEnemies = 1 //_.filter(items, i => i.type === TileType.Sword).length
@@ -157,6 +165,7 @@ export function generateRoom(coord: GamePosition, entrance?: GameObject[], forbi
     size,
     exits,
     items,
+    floorItems,
     enemies,
     pos: coord
   }
@@ -165,9 +174,9 @@ export function generateRoom(coord: GamePosition, entrance?: GameObject[], forbi
     const factories = [
       { type: TileType.Sword, tile: TileType.Sword },
       { type: TileType.Money, tile: TileType.Money },
-      { type: TileType.Potion, tile: TileType.Potion, charges: 2 },
+      { type: TileType.Potion, tile: TileType.Potion, charges: 0 },
       { type: TileType.Wand, tile: TileType.Wand },
-      { type: TileType.Shield, tile: TileType.Shield },
+      { type: TileType.Shield, tile: TileType.Shield }
     ]
 
     const data = { ..._.sample(factories)!, ...pos }

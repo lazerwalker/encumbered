@@ -24,6 +24,8 @@ export enum TileType {
   TopRightCorner = "┐",
   BottomLeftCorner = "└",
   BottomRightCorner = "┘",
+
+  Fountain = "f"
 }
 
 export interface GamePosition {
@@ -43,7 +45,7 @@ export interface RenderObject {
 
 // (0, 0) is bottom-left
 export default function renderGrid(state: State): RenderObject[] {
-  const { size, enemies, exits, player, items } = state
+  const { size, enemies, exits, player, items, floorItems } = state
 
   function toRenderObject(obj: GameObject): RenderObject {
     let isPlayer = false
@@ -82,7 +84,12 @@ export default function renderGrid(state: State): RenderObject[] {
     }
   }
 
-  const gameObjects: (GameObject | undefined)[] = [player, ...exits, ...enemies, ...items]
+  const gameObjects: (GameObject | undefined)[] = [
+    player,
+    ...exits,
+    ...enemies,
+    ...items,
+    ...floorItems]
 
   for (let i = 0; i <= size - 1; i++) {
     gameObjects.push(makeWall(i, -1, "wall-horizontal.png", `bottomWall-${i}`))

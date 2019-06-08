@@ -19,6 +19,7 @@ export interface State {
 
   enemies: Enemy[]
   items: Item[]
+  floorItems: GameObject[]
   exits: GameObject[]
 
   size: number

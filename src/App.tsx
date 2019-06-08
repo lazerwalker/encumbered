@@ -43,6 +43,7 @@ class App extends React.Component<{}, State> {
       player: PlayerFactory(2, 2),
       enemies: room.enemies,
       items: room.items,
+      floorItems: room.floorItems,
       size: room.size,
       exits: room.exits,
 
@@ -166,7 +167,8 @@ class App extends React.Component<{}, State> {
       // "KeyR": { type: ActionType.Reset, payload: this.initialState },
 
       "KeyQ": { type: ActionType.Heal },
-      "KeyR": { type: ActionType.Rotate }
+      "KeyR": { type: ActionType.Rotate },
+      "KeyF": { type: ActionType.Fill }
 
     }
 
