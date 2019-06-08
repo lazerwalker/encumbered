@@ -15,14 +15,14 @@ export function heal(state: State): [State, boolean] {
 
   if (fountain && fountain.health > 0) {
     fountain.health -= 1
-    state.player.health += 1
+    state.player.health += 2
     return [state, true]
   }
 
   const potion = state.items.find(i => i.held && i.type === TileType.Potion)
   if (potion && potion.charges > 0) {
     potion.charges -= 1
-    state.player.health += 1
+    state.player.health += 2
 
     return [state, true]
   }
