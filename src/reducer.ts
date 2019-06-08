@@ -33,7 +33,7 @@ export function reducer(state: State, action: Action): State {
     const thePotion = newState.items.find(i => i.key === potion.key)!
 
     thePotion.charges -= 1
-    newState.hp += 1
+    newState.player.health += 1
 
     return newState
   } else { // For now, this is just movement
@@ -209,8 +209,8 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
   let enemy = _.find(newState.enemies, e => e.x === player.x && e.y === player.y)
   if (enemy) {
     stopMovement = true
-    newState.hp -= 1
-    if (newState.hp <= 0) {
+    newState.player.health -= 1
+    if (newState.player.health <= 0) {
       newState.gameOver = true
     }
 

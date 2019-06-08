@@ -39,11 +39,15 @@ export function moveEnemy(state: State, e: Enemy): State {
   // It's possible that the player moved one of their items into the enemy.
   // If that's the case, resolve that rather than do anything fancier.
   // (We could resolve this when we resolve item movement, but that also feels weird?)
-  const item = state.items.find(i => i.held && i.x === enemy.x && i.y === enemy.y)
+  const item = newState.items.find(i => i.held && i.x === enemy.x && i.y === enemy.y)
   if (item) {
     console.log("Tiring out")
     enemy.stunned = true
-    newState.items = _.without(state.items, item)
+
+    item.health -= 1
+    if (item.health <= 0) {
+      newState.items = _.without(newState.items, item)
+    }
     return newState
   }
 
@@ -96,11 +100,11 @@ export function moveEnemy(state: State, e: Enemy): State {
     console.log(newPos)
 
     if (newState.player.x === enemy.x && newState.player.y === enemy.y) {
-      newState.hp -= 1
+      newState.player.health -= 1
       enemy.x = oldPos.x
       enemy.y = oldPos.y
       enemy.currentAnimation = attackAnimation(enemy, newState.player)
-      if (newState.hp <= 0) {
+      if (newState.player.health <= 0) {
         newState.gameOver = true
       }
     }
@@ -144,6 +148,7 @@ export function EnemyFactory(x: number, y: number) {
     stunned: false,
     stunnedThisTurn: false,
     sprite: sprite,
-    key: uuid()
+    key: uuid(),
+    health: _.random(1, 3)
   }
 }

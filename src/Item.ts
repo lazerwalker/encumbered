@@ -41,6 +41,7 @@ export function ItemFactory(props: any): Item {
     ...props,
     key: uuid(),
     sprite: sprite,
-    held: false
+    held: false,
+    health: 1
   }
 }

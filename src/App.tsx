@@ -39,7 +39,6 @@ class App extends React.Component<{}, State> {
     this.initialState = {
       exited: false,
       gameOver: false,
-      hp: 3,
       maxHP: 3,
       player: PlayerFactory(2, 2),
       enemies: room.enemies,
@@ -96,7 +95,7 @@ class App extends React.Component<{}, State> {
 
     return (
       <div className="App">
-        <div id='score-and-hp'>${score} | {this.state.hp}/{this.state.maxHP}</div>
+        <div id='score-and-hp'>${score} | {this.state.player.health}/{this.state.maxHP}</div>
         {grid}
       </div>
     );

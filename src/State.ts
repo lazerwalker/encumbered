@@ -8,7 +8,6 @@ import { GameObject } from "./GameObject";
 export interface State {
   player: GameObject
 
-  hp: number
   maxHP: number
 
   exited: boolean

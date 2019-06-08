@@ -5,4 +5,6 @@ export interface GameObject {
   key: string
 
   sprite: ((obj: GameObject) => string)
+
+  health: number
 }

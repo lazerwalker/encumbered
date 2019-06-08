@@ -8,6 +8,7 @@ export function ExitFactory(x: number, y: number): GameObject {
     x,
     y,
     sprite: sprite,
-    key: uuid()
+    key: uuid(),
+    health: -1
   }
 }

@@ -76,7 +76,8 @@ export default function renderGrid(state: State): RenderObject[] {
     } else {
       return {
         x, y, key,
-        sprite: (obj) => sprite
+        sprite: (obj) => sprite,
+        health: -1
       }
     }
   }
