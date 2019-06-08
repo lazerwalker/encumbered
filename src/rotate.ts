@@ -1,6 +1,6 @@
 import { State } from "./State";
 import _ from "lodash";
-import { GamePosition } from "./renderGrid";
+import { GamePosition, boundsCoordinates } from "./renderGrid";
 
 // Move each held item 90 degrees clockwise
 export function rotate(state: State): State {
@@ -27,8 +27,11 @@ export function rotate(state: State): State {
       i.y = state.player.y - newVector.y
     })
 
+  let walls = boundsCoordinates(state)
   const hasNoCollisions = heldItems.reduce((acc, i) => {
-    return acc && !newState.items.find(j => i !== j && i.x === j.x && i.y === j.y)
+    return acc
+      && !newState.items.find(j => i !== j && i.x === j.x && i.y === j.y)
+      && !walls.find(j => i !== j && i.x === j.x && i.y === j.y)
   }, true)
 
   return hasNoCollisions ? newState : state
