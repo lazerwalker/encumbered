@@ -3,7 +3,7 @@ import _ from "lodash";
 import { GamePosition, boundsCoordinates } from "./renderGrid";
 
 // Move each held item 90 degrees clockwise
-export function rotate(state: State): State {
+export function rotate(state: State): [State, boolean] {
   const newState = _.cloneDeep(state)
 
   const vectorMap: { [initialPosition: string]: GamePosition } = {
@@ -34,5 +34,5 @@ export function rotate(state: State): State {
       && !walls.find(j => i !== j && i.x === j.x && i.y === j.y)
   }, true)
 
-  return hasNoCollisions ? newState : state
+  return hasNoCollisions ? [newState, true] : [state, false]
 }

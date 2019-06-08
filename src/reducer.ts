@@ -9,91 +9,52 @@ import { moveEnemy } from "./Enemy";
 import { ActionType, Action, ResetAction } from "./actions";
 import { rotate } from "./rotate";
 import { attackAnimation } from "./attackAnimation";
+import { fill } from "./playerActions/fill";
+import { heal } from "./playerActions/heal";
 
 
 export function reducer(oldState: State, action: Action): State {
-  const state = _.cloneDeep(oldState)
+  let state = _.cloneDeep(oldState)
+  let enemiesMove = true
+
   delete state.player.currentAnimation
-  console.log(state.player.currentAnimation)
 
   if (action.type === ActionType.Reset) {
-    return (action as ResetAction).payload
+    state = (action as ResetAction).payload
+    enemiesMove = false
   } else if (action.type === ActionType.Release) {
-    return release(state)
+    [state, enemiesMove] = release(state)
   } else if (action.type === ActionType.Rotate) {
-    return rotate(state)
+    [state, enemiesMove] = rotate(state)
   } else if (action.type === ActionType.Wait) {
-    return moveEnemies(state)
+    // leave state same, let enemies move
   } else if (action.type === ActionType.Fill) {
-    const potions = state.items.filter(i => i.held && i.type === TileType.Potion && i.charges < 2)
-    for (let p = 0; p < potions.length; p++) {
-      const potion = potions[p]
-      const fountain = state.floorItems.find(i => {
-        return i.x === potion.x
-          && i.y === potion.y
-          && i.health > 0
-      })
-      if (fountain) {
-        potion.charges += 1
-        fountain.health -= 1
-        return state
-      }
-    }
-    return state
+    [state, enemiesMove] = fill(state)
   } else if (action.type === ActionType.Heal) {
-    // TODO: This doesn't process enemy movement!
-    console.log("Trying to heal", state.items)
-
-    // TODO: Floor items need types!
-    const fountain = state.floorItems.find(i => {
-      return i.x === state.player.x
-        && i.y === state.player.y
-        && i.health > 0
-    })
-
-    if (fountain && fountain.health > 0) {
-      fountain.health -= 1
-      state.player.health += 1
-      return state
-    }
-
-    const potion = state.items.find(i => i.held && i.type === TileType.Potion)
-    if (potion && potion.charges > 0) {
-      potion.charges -= 1
-      state.player.health += 1
-
-      return state
-    }
-
-    // No valid heal state, do nothing
-    return state
+    [state, enemiesMove] = heal(state)
   } else { // For now, this is just movement
     const vector = movementVector(action)
 
-    let enemiesMove = true
-
-    let newState = _.cloneDeep(state)
-
     // If the player/their items would collide with the wall, we can exit immediately
     if (collidesWithWall(vector, state)) {
-      return state
-    }
-
-    // Try to move player/items, 
-    // picking up other items + attacking enemies as appropriate
-    [newState, enemiesMove] = resolveMovement(vector, newState, state)
-
-    if (hasExitedRoom(state)) {
-      newState = nextRoom(newState, state)
       enemiesMove = false
-    }
+    } else {
+      // Try to move player/items, 
+      // picking up other items + attacking enemies as appropriate
+      [state, enemiesMove] = resolveMovement(vector, state, oldState)
 
-    if (enemiesMove) {
-      newState = moveEnemies(newState)
+      if (hasExitedRoom(state)) {
+        state = nextRoom(state, oldState)
+        enemiesMove = false
+      }
     }
-
-    return newState
   }
+
+  if (enemiesMove) {
+    state = moveEnemies(state)
+  }
+
+  return state
 }
 
 function nextRoom(newState: State, state: State): State {
@@ -129,16 +90,16 @@ function nextRoom(newState: State, state: State): State {
   }
 }
 
-function release(state: State): State {
+function release(state: State): [State, boolean] {
   const heldItems = state.items.filter(i => i.held)
-  if (heldItems.length === 0) return state
+  if (heldItems.length === 0) return [state, false]
 
   heldItems.forEach(i => i.held = false)
 
-  return {
+  return [{
     ...state,
     items: _.cloneDeep(state.items)
-  }
+  }, false]
 }
 
 function movementVector(action: Action): GamePosition {
@@ -244,6 +205,7 @@ function resolveMovement(movementVector: GamePosition, state: State, oldState: S
       if (i.x === player.x && i.y === player.y) {
         i.held = true
         stopMovement = true
+        enemiesMove = false
       }
     }
   })
